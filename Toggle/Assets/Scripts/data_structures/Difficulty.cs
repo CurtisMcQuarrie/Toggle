@@ -8,13 +8,13 @@ public class Difficulty
     #region constructors
     public Difficulty()
     {
-        setupDifficulty();
+        SetupDifficulty();
     }
 
     public Difficulty(Difficulties difficulty)
     {
         currDifficulty = difficulty;
-        setupDifficulty();
+        SetupDifficulty();
     }
     #endregion
 
@@ -25,7 +25,12 @@ public class Difficulty
     #endregion
 
     #region methods
-    private void setupDifficulty()
+    public override string ToString()
+    {
+        return currDifficulty.ToString();
+    }
+
+    private void SetupDifficulty()
     {
         if (currDifficulty == Difficulties.EASY)
         {
