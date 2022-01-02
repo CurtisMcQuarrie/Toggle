@@ -85,30 +85,22 @@ public class Gameboard
     #region private methods
 
     #region solution helper methods
+    // TODO
     private bool CheckColSolution()
     {
         bool solved = true;
-        /*for (int col = 0; col < currDifficulty.BoardSize; col++)
+        List<int> colCounts = new List<int>();
+        for (int col = 0; col < currDifficulty.BoardSize; col++)
         {
-            int[] countEnabled = new int[currDifficulty.BoardSize];
-            int startIndex = 0;
+            
             for (int row = 0; row < currDifficulty.BoardSize; row++)
             {
-                if (board[row,col].Enabled)
-                {
-                    countEnabled++;
-                }
 
             }
-            if (solution[row, col] != countEnabled)
-            {
-                solved = false;
-                break;
-            }
-        }*/
+        }
         return solved;
     }
-
+    // TODO
     private bool CheckRowSolution()
     {
         bool solved = true;
@@ -137,7 +129,7 @@ public class Gameboard
                 }
                 else if (consecutiveEnabled >= 1)
                 {
-                    colTileEnabledCount.Add(consecutiveEnabled);
+                    colTileEnabledCount.Add(consecutiveEnabled); //might need to change to 2D
                     consecutiveEnabled = 0;
                     currIndex++;
                 }
@@ -159,16 +151,12 @@ public class Gameboard
             bool rowFilled = false;
             int startingCol = 0;
             int maxEnabled = currDifficulty.BoardSize + 1;
-            //int currCountDisabled = currDifficulty.BoardSize;
             while (!rowFilled)
             {
                 // logic for randomly generating row tile count enabled
-                //int amountEnabled = Random.Range(0, currCountDisabled+1);
                 int amountEnabled = Random.Range(0, maxEnabled);
-                rowTileEnabledCount.Add(amountEnabled);
-                //currCountDisabled -= (amountEnabled+1);
+                rowTileEnabledCount.Add(amountEnabled); //might need to change to 2D
                 maxEnabled -= (amountEnabled + 1);
-                //if (currCountDisabled <= 1 || amountEnabled <= 0)
                 if (maxEnabled < 1 || amountEnabled <= 0)
                 {
                     rowFilled = true;
@@ -182,7 +170,7 @@ public class Gameboard
 
     private void EnableTileRows(int rowIndex, int colIndex, int amountEnabled)
     {
-        Debug.Log("Current rowIndex is " + rowIndex + ", colIndex is " + colIndex + " and amountEnabled is " + amountEnabled);
+        //Debug.Log("Current rowIndex is " + rowIndex + ", colIndex is " + colIndex + " and amountEnabled is " + amountEnabled);
         for (int index = 0; index < amountEnabled; index++)
         {
             solutionBoard[rowIndex, colIndex + index].Toggle();

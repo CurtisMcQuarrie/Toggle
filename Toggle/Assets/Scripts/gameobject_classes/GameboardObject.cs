@@ -23,6 +23,12 @@ public class GameboardObject : MonoBehaviour
     #endregion
 
     #region public methods
+    public void SetDifficulty(int difficulty)
+    {
+        Debug.Log("Set difficulty to " + (Difficulties)difficulty);
+        gameboard = new Gameboard(new Difficulty( (Difficulties) difficulty));
+    }
+
     public void Reroll()
     {
         Debug.Log("Rerolling Board...");
