@@ -16,7 +16,7 @@ public class Gameboard
     public Gameboard()
     {
         currDifficulty = new Difficulty(Difficulties.EASY);
-        gameboard = CreateBoard();
+        //gameboard = CreateBoard();
         rowTileEnabledCount = new List<int>();
         colTileEnabledCount = new List<int>();
     }
@@ -24,14 +24,14 @@ public class Gameboard
     public Gameboard(Difficulty difficulty)
     {
         currDifficulty = difficulty;
-        gameboard = CreateBoard();
+        //gameboard = CreateBoard();
         rowTileEnabledCount = new List<int>();
         colTileEnabledCount = new List<int>();
     }
     #endregion
 
     #region properties
-
+    public int Size() { return currDifficulty.BoardSize; }
     #endregion
 
     #region public methods
@@ -59,6 +59,20 @@ public class Gameboard
         return solved;
     }
 
+    public Tile[,] CreateBoard()
+    {
+        Tile[,] board = new Tile[currDifficulty.BoardSize, currDifficulty.BoardSize];
+
+        for (int col = 0; col < currDifficulty.BoardSize; col++)
+        {
+            for (int row = 0; row < currDifficulty.BoardSize; row++)
+            {
+                board[row, col] = new Tile();
+            }
+        }
+        return board;
+    }
+
     public void GenerateSolution()
     {
         solutionBoard = CreateBoard();
@@ -80,6 +94,11 @@ public class Gameboard
         }
         Debug.Log(solution);
     }
+
+    public void Toggle(Tile tile)
+    {
+        tile.Toggle();
+    }
     #endregion
 
     #region private methods
@@ -92,7 +111,6 @@ public class Gameboard
         List<int> colCounts = new List<int>();
         for (int col = 0; col < currDifficulty.BoardSize; col++)
         {
-            
             for (int row = 0; row < currDifficulty.BoardSize; row++)
             {
 
@@ -162,13 +180,13 @@ public class Gameboard
                     rowFilled = true;
                 }
                 // TODO: add a random startingCol to place
-                EnableTileRows(row, startingCol, amountEnabled);
+                EnableSolutionTileRows(row, startingCol, amountEnabled);
                 startingCol += amountEnabled + 1;
             }
         }
     }
 
-    private void EnableTileRows(int rowIndex, int colIndex, int amountEnabled)
+    private void EnableSolutionTileRows(int rowIndex, int colIndex, int amountEnabled)
     {
         //Debug.Log("Current rowIndex is " + rowIndex + ", colIndex is " + colIndex + " and amountEnabled is " + amountEnabled);
         for (int index = 0; index < amountEnabled; index++)
@@ -178,18 +196,5 @@ public class Gameboard
     }
     #endregion 
 
-    private Tile[,] CreateBoard()
-    {
-        Tile[,] board = new Tile[currDifficulty.BoardSize, currDifficulty.BoardSize];
-
-        for (int col = 0; col < currDifficulty.BoardSize; col++)
-        {
-            for (int row = 0; row < currDifficulty.BoardSize; row++)
-            {
-                board[row, col] = new Tile();
-            }
-        }
-        return board;
-    }
     #endregion
 }

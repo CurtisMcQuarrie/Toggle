@@ -6,6 +6,8 @@ public class GameboardObject : MonoBehaviour
 {
     #region fields
     private Gameboard gameboard;
+    public GameObject tilePrefab;
+    public Transform gameboardPanel;
     #endregion
 
     #region monobehaviour
@@ -13,16 +15,27 @@ public class GameboardObject : MonoBehaviour
     void Start()
     {
         gameboard = new Gameboard();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        CreateBoardGUI();
     }
     #endregion
 
     #region public methods
+    public void CreateBoardGUI()
+    {
+        Tile[,] tiles = gameboard.CreateBoard();
+        for (int row = 0; row < gameboard.Size(); row++)
+        {
+            for (int col = 0; col < gameboard.Size(); col++)
+            {
+                GameObject tile = Instantiate(tilePrefab, gameboardPanel);
+                TileObject tileObject = tile.GetComponent<TileObject>();
+                tileObject.Gameboard = gameboard;
+                tileObject.Tile = tiles[row, col];
+                //tileObject.SetupCommands();
+            }
+        }
+    }
+
     public void SetDifficulty(int difficulty)
     {
         Debug.Log("Set difficulty to " + (Difficulties)difficulty);

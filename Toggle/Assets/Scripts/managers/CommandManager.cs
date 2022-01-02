@@ -24,7 +24,7 @@ public class CommandManager : MonoBehaviour
     #endregion
 
     #region monobehaviour
-    private void Awake()
+    void Awake()
     {
         _instance = this;
     }
