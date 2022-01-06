@@ -5,48 +5,45 @@ using UnityEngine;
 public class GameboardObject : MonoBehaviour
 {
     #region fields
-    private Gameboard gameboard;
     public GameObject tilePrefab;
-    public Transform gameboardPanel;
+    public GameObject spacerPrefab;
     #endregion
 
     #region monobehaviour
-    // Start is called before the first frame update
-    void Start()
-    {
-        gameboard = new Gameboard();
-        CreateBoardGUI();
-    }
     #endregion
 
     #region public methods
-    public void CreateBoardGUI()
+    public GameObject[] CreateBoardRow(Tile[] rowTiles, Transform parentTransform)
     {
-        Tile[,] tiles = gameboard.CreateBoard();
-        for (int row = 0; row < gameboard.Size(); row++)
+        GameObject[] rowTileObjects = new GameObject[rowTiles.Length];
+        if (rowTiles == null)
         {
-            for (int col = 0; col < gameboard.Size(); col++)
+            Debug.Log("Missing Tile array when instantiating row of Tile GameObjects.");
+        }
+        else if (parentTransform == null)
+        {
+            Debug.Log("Missing parentTransform when instantiating row of Tile GameObjects.");
+        }
+        else
+        {
+            for (int col = 0; col < rowTileObjects.Length; col++)
             {
-                GameObject tile = Instantiate(tilePrefab, gameboardPanel);
-                TileObject tileObject = tile.GetComponent<TileObject>();
-                tileObject.Gameboard = gameboard;
-                tileObject.Tile = tiles[row, col];
-                //tileObject.SetupCommands();
+                rowTileObjects[col] = Instantiate(tilePrefab, parentTransform);
             }
         }
+        return rowTileObjects;
     }
 
-    public void SetDifficulty(int difficulty)
+    public void CreateSpacerPanel(Transform parentTransform)
     {
-        Debug.Log("Set difficulty to " + (Difficulties)difficulty);
-        gameboard = new Gameboard(new Difficulty( (Difficulties) difficulty));
-    }
-
-    public void Reroll()
-    {
-        Debug.Log("Rerolling Board...");
-        gameboard.GenerateSolution();
-        gameboard.PrintSolution();
+        if(spacerPrefab != null)
+        {
+            Instantiate(spacerPrefab, parentTransform);
+        }
+        else
+        {
+            Debug.Log("Spacer prefab is null when trying to instantiate.");
+        }
     }
     #endregion
 
