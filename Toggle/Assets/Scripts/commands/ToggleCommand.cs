@@ -14,7 +14,7 @@ public class ToggleCommand : ICommand
     public void Execute()
     {
         PerformToggle();
-        Debug.Log("Enabled state set to " + tile.Enabled);
+        //Debug.Log("Enabled state set to " + tile.Enabled);
     }
 
     public void Redo()
@@ -31,7 +31,7 @@ public class ToggleCommand : ICommand
     {
         if (gameboard != null)
         {
-            gameboard.Toggle(tile);
+            gameboard.ToggleTile(tile);
         }
     }
 }

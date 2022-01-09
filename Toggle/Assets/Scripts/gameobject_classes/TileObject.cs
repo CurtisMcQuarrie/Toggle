@@ -7,12 +7,11 @@ public class TileObject : MonoBehaviour
 {
     #region fields
     private Gameboard gameboard;
-    private Button button;
+    private Toggle toggle;
     private Tile tile;
-    private Color colorChange;
-    private Color disabledColor;
     public List<ICommand> commands;
     public Color enabledColor;
+    public Color disabledColor;
     #endregion
 
     #region properties
@@ -29,9 +28,8 @@ public class TileObject : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        button = this.GetComponent<Button>();
-        button.onClick.AddListener(ExecuteCommands);
-        disabledColor = button.colors.normalColor;
+        toggle = this.GetComponent<Toggle>();
+        toggle.onValueChanged.AddListener(OnToggleValueChange);
     }
     #endregion
 
@@ -41,7 +39,6 @@ public class TileObject : MonoBehaviour
         if (gameboard != null && tile != null)
         {
             commands.Add(new ToggleCommand(gameboard, tile));
-            commands.Add(new ColorChangeCommand(button, colorChange));
         }
         else
         {
@@ -54,10 +51,7 @@ public class TileObject : MonoBehaviour
         ToggleCommand toggleCommand = new ToggleCommand(gameboard, tile);
         CommandManager.Instance.AddCommand(toggleCommand);
         toggleCommand.Execute();
-        ComputeColorChange();
-        ColorChangeCommand colorChangeCommand = new ColorChangeCommand(button, colorChange);
-        CommandManager.Instance.AddCommand(colorChangeCommand);
-        colorChangeCommand.Execute();
+        //ColorChangeCommand colorChangeCommand = new ColorChangeCommand();
         /*foreach (ICommand command in commands)
         {
             CommandManager.Instance.AddCommand(command);
@@ -66,16 +60,28 @@ public class TileObject : MonoBehaviour
         }*/
     }
 
-    private void ComputeColorChange()
+    private void OnToggleValueChange(bool isOn)
     {
-        if (tile.Enabled)
+        ExecuteCommands();
+        ChangeColor(isOn);
+    }
+
+    private void ChangeColor(bool isOn)
+    {
+        ColorBlock colorBlock = toggle.colors;
+        if (isOn)
         {
-            colorChange = disabledColor;
+            colorBlock.normalColor = enabledColor;
+            colorBlock.highlightedColor = enabledColor;
+            colorBlock.selectedColor = enabledColor;
         }
         else
         {
-            colorChange = enabledColor;
+            colorBlock.normalColor = disabledColor;
+            colorBlock.highlightedColor = disabledColor;
+            colorBlock.selectedColor = disabledColor;
         }
+        toggle.colors = colorBlock;
     }
     #endregion
 }

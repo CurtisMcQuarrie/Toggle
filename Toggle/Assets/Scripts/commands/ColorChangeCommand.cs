@@ -5,22 +5,22 @@ using UnityEngine.UI;
 
 public class ColorChangeCommand : ICommand
 {
-    private Button button;
+    private Toggle toggle;
     private Color color;
     private Color previousColor;
 
-    public ColorChangeCommand(Button button, Color color)
+    public ColorChangeCommand(Toggle toggle, Color color)
     {
-        this.button = button;
+        this.toggle = toggle;
         this.color = color;
     }
 
     public void Execute()
     {
-        ColorBlock colors = button.colors;
+        ColorBlock colors = toggle.colors;
         previousColor = colors.normalColor;
         colors.normalColor = color;
-        button.colors = colors;
+        toggle.colors = colors;
         Debug.Log("Color changed to " + colors.normalColor.ToString());
     }
 
@@ -31,8 +31,8 @@ public class ColorChangeCommand : ICommand
 
     public void Undo()
     {
-        ColorBlock colors = button.colors;
+        ColorBlock colors = toggle.colors;
         colors.normalColor = previousColor;
-        button.colors = colors;
+        toggle.colors = colors;
     }
 }

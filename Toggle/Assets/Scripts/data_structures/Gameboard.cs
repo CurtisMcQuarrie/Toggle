@@ -6,7 +6,7 @@ public class Gameboard
     #region fields
     private int[,] solutions;
     private Tile[,] gameboard;
-    private Tile[,] solutionBoard; // temp
+    private Tile[,] solutionBoard;
     private List<Hint> rowHints;
     private List<Hint> colHints;
     private Difficulty currDifficulty;
@@ -51,16 +51,6 @@ public class Gameboard
         }
     }
 
-    public bool CheckSolution()
-    {
-        bool solved = false;
-        if (CheckRowSolution() && CheckColSolution())
-        {
-            solved = true;
-        }
-        return solved;
-    }
-
     public Tile[,] CreateBoard()
     {
         Tile[,] board = new Tile[currDifficulty.BoardSize, currDifficulty.BoardSize];
@@ -77,9 +67,11 @@ public class Gameboard
 
     public void GenerateSolution()
     {
+        Debug.Log("Generating solution for board...");
         gameboard = CreateBoard();
         solutionBoard = CreateBoard();
         ComputeEnabledCounts();
+        Debug.Log("Solution generation completed.");
     }
 
     public Tile[] GetRow(int rowNum)
@@ -118,53 +110,148 @@ public class Gameboard
         Debug.Log(solution);
     }
 
-    public void Toggle(Tile tile)
+    public void ToggleTile(Tile tile)
     {
         tile.Toggle();
+        if (CheckSolution())
+            Debug.Log("You Win!");
     }
     #endregion
 
     #region private methods
 
-    #region solution helper methods
-    // TODO
+    #region solution checking helper methods
+
+    private bool CheckSolution()
+    {
+        return CheckColSolution() && CheckRowSolution();
+    }
+    
     private bool CheckColSolution()
     {
         bool solved = true;
-        List<int> colCounts = new List<int>();
-        for (int col = 0; col < currDifficulty.BoardSize; col++)
+        for (int col = 0; col < currDifficulty.BoardSize && solved; col++)
         {
-            for (int row = 0; row < currDifficulty.BoardSize; row++)
+            int[] currColHint = GetColHints(col);
+            int currHintIndex = 0;
+            int consecutiveEnabled = 0;
+            for (int row = 0; row < currDifficulty.BoardSize && solved; row++)
             {
-
+                if (gameboard[row, col].Enabled)
+                {
+                    consecutiveEnabled++;
+                    if (currColHint.Length == 0 || currHintIndex >= currColHint.Length)
+                    {
+                        solved = false;
+                    }
+                    else if (row == currDifficulty.BoardSize - 1 && (currHintIndex != currColHint.Length - 1 || consecutiveEnabled != currColHint[currHintIndex]))
+                    {
+                        solved = false;
+                    }
+                }
+                else if (!gameboard[row, col].Enabled)
+                {
+                    if (consecutiveEnabled > 0)
+                    {
+                        if (currColHint.Length == 0 || currHintIndex >= currColHint.Length)
+                        {
+                            solved = false;
+                        }
+                        else
+                        {
+                            if (row == currDifficulty.BoardSize - 1 && (currHintIndex != currColHint.Length - 1 || consecutiveEnabled != currColHint[currHintIndex]))
+                            {
+                                solved = false;
+                            }
+                            else if (consecutiveEnabled != currColHint[currHintIndex])
+                            {
+                                solved = false;
+                            }
+                            else if (consecutiveEnabled == currColHint[currHintIndex])
+                            {
+                                currHintIndex++;
+                                consecutiveEnabled = 0;
+                            }
+                        }
+                    }
+                    else if (row == currDifficulty.BoardSize - 1 && currHintIndex != currColHint.Length)
+                    {
+                        solved = false;
+                    }
+                }
             }
         }
         return solved;
     }
-    // TODO
+
     private bool CheckRowSolution()
     {
         bool solved = true;
-        /*for (int col = 0; col < currDifficulty.BoardSize; col++)
+        for (int row = 0; row < currDifficulty.BoardSize && solved; row++)
         {
-            for (int row = 0; row < currDifficulty.BoardSize; row++)
+            int[] currRowHint = GetRowHints(row);
+            int currHintIndex = 0;
+            int consecutiveEnabled = 0;
+            for (int col = 0; col < currDifficulty.BoardSize && solved; col++)
             {
-
+                if (gameboard[row, col].Enabled)
+                {
+                    consecutiveEnabled++;
+                    if (currRowHint.Length == 0 || currHintIndex >= currRowHint.Length)
+                    {
+                        solved = false;
+                    }
+                    else if (col == currDifficulty.BoardSize - 1 && (currHintIndex != currRowHint.Length - 1 || consecutiveEnabled != currRowHint[currHintIndex]))
+                    {
+                        solved = false;
+                    }
+                }
+                else if (!gameboard[row, col].Enabled)
+                {
+                    if (consecutiveEnabled > 0)
+                    {
+                        if (currRowHint.Length == 0 || currHintIndex >= currRowHint.Length)
+                        {
+                            solved = false;
+                        }
+                        else
+                        {
+                            if (col == currDifficulty.BoardSize - 1 && (currHintIndex != currRowHint.Length - 1 || consecutiveEnabled != currRowHint[currHintIndex]))
+                            {
+                                solved = false;
+                            }
+                            else if (consecutiveEnabled != currRowHint[currHintIndex])
+                            {
+                                solved = false;
+                            }
+                            else if (consecutiveEnabled == currRowHint[currHintIndex])
+                            {
+                                currHintIndex++;
+                                consecutiveEnabled = 0;
+                            }
+                        }
+                    }
+                    else if (col == currDifficulty.BoardSize - 1 && currHintIndex != currRowHint.Length)
+                    {
+                        solved = false;
+                    }
+                }
             }
-        }*/
+        }
         return solved;
     }
+    #endregion
 
+    #region solution generation helper methods
     /*
      * Computes the column hints
      * Uses the output from ComputeRowEnabledCount() to determine the column hints.
-     */ 
+     */
     private void ComputeColEnabledCount()
     {
         for (int col = 0; col < currDifficulty.BoardSize; col++)
         {
             int consecutiveEnabled = 0;
-            int currIndex = 0;
             colHints.Add(new Hint());
 
             for (int row = 0; row < currDifficulty.BoardSize; row++)
@@ -172,12 +259,15 @@ public class Gameboard
                 if (solutionBoard[row, col].Enabled)
                 {
                     consecutiveEnabled++;
+                    if (row == currDifficulty.BoardSize - 1)
+                    {
+                        colHints[col].Add(consecutiveEnabled);
+                    }
                 }
                 else if (consecutiveEnabled >= 1)
                 {
                     colHints[col].Add(consecutiveEnabled);
                     consecutiveEnabled = 0;
-                    currIndex++;
                 }
             }
         }
@@ -188,8 +278,12 @@ public class Gameboard
      */ 
     private void ComputeEnabledCounts()
     {
+        Debug.Log("Computing rows...");
         ComputeRowEnabledCount();
+        Debug.Log("Row computation complete.");
+        Debug.Log("Computing columns...");
         ComputeColEnabledCount();
+        Debug.Log("Column computation complete.");
     }
 
     /*
@@ -220,6 +314,7 @@ public class Gameboard
                 }
                 
                 // TODO: add a random startingCol to place
+
                 EnableSolutionTileRows(row, startingCol, amountEnabled);
                 startingCol += amountEnabled + 1;
             }
