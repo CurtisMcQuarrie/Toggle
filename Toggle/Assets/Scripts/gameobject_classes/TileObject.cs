@@ -51,13 +51,6 @@ public class TileObject : MonoBehaviour
         ToggleCommand toggleCommand = new ToggleCommand(gameboard, tile);
         CommandManager.Instance.AddCommand(toggleCommand);
         toggleCommand.Execute();
-        //ColorChangeCommand colorChangeCommand = new ColorChangeCommand();
-        /*foreach (ICommand command in commands)
-        {
-            CommandManager.Instance.AddCommand(command);
-            command.Execute();
-            Debug.Log("Command executed...");
-        }*/
     }
 
     private void OnToggleValueChange(bool isOn)

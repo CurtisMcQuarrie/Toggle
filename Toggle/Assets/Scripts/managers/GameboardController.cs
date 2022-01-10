@@ -66,8 +66,8 @@ public class GameboardController : MonoBehaviour
 
     public void SetDifficulty(int difficulty)
     {
-        Debug.Log("Set difficulty to " + (Difficulties)difficulty);
-        gameboard = new Gameboard(new Difficulty((Difficulties)difficulty));
+        Debug.Log("Set difficulty to " + (Difficulty)difficulty);
+        gameboard = new Gameboard((Difficulty)difficulty);
     }
 
     public void Reroll()

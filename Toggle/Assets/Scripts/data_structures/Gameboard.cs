@@ -3,34 +3,36 @@ using System.Collections.Generic;
 
 public class Gameboard
 {
+    #region constants
+    private const int initialSize = 3;
+    #endregion
+
     #region fields
-    private int[,] solutions;
     private Tile[,] gameboard;
     private Tile[,] solutionBoard;
     private List<Hint> rowHints;
     private List<Hint> colHints;
-    private Difficulty currDifficulty;
-
+    private int size;
     #endregion
 
     #region constructors
     public Gameboard()
     {
-        currDifficulty = new Difficulty(Difficulties.EASY);
         rowHints = new List<Hint>();
         colHints = new List<Hint>();
+        size = (int)Difficulty.Easy + initialSize;
     }
 
     public Gameboard(Difficulty difficulty)
     {
-        currDifficulty = difficulty;
         rowHints = new List<Hint>();
         colHints = new List<Hint>();
+        size = (int)difficulty + initialSize;
     }
     #endregion
 
     #region properties
-    public int Size() { return currDifficulty.BoardSize; }
+    public int Size() { return size; }
     public Tile GetTile(int row, int col) { return gameboard[row, col]; }
     public int[] GetRowHints(int row) { return rowHints[row].HintValues; }
     public int[] GetColHints(int col) { return colHints[col].HintValues; }
@@ -41,11 +43,12 @@ public class Gameboard
     {
         if (gameboard != null)
         {
-            for (int col = 0; col < currDifficulty.BoardSize; col++)
+            for (int col = 0; col < size; col++)
             {
-                for (int row = 0; row < currDifficulty.BoardSize; row++)
+                for (int row = 0; row < size; row++)
                 {
-                    gameboard[row, col].Enabled = false;
+                    if (gameboard[row, col].IsOn == true)
+                        gameboard[row, col].Toggle();
                 }
             }
         }
@@ -53,11 +56,11 @@ public class Gameboard
 
     public Tile[,] CreateBoard()
     {
-        Tile[,] board = new Tile[currDifficulty.BoardSize, currDifficulty.BoardSize];
+        Tile[,] board = new Tile[size, size];
 
-        for (int col = 0; col < currDifficulty.BoardSize; col++)
+        for (int col = 0; col < size; col++)
         {
-            for (int row = 0; row < currDifficulty.BoardSize; row++)
+            for (int row = 0; row < size; row++)
             {
                 board[row, col] = new Tile();
             }
@@ -76,8 +79,8 @@ public class Gameboard
 
     public Tile[] GetRow(int rowNum)
     {
-        Tile[] rowTiles = new Tile[Size()];
-        for (int col = 0; col < Size(); col++)
+        Tile[] rowTiles = new Tile[size];
+        for (int col = 0; col < size; col++)
         {
             rowTiles[col] = gameboard[rowNum, col];
         }
@@ -86,8 +89,8 @@ public class Gameboard
 
     public Tile[] GetCol(int colNum)
     {
-        Tile[] colTiles = new Tile[Size()];
-        for (int row = 0; row < Size(); row++)
+        Tile[] colTiles = new Tile[size];
+        for (int row = 0; row < size; row++)
         {
             colTiles[row] = gameboard[row, colNum];
         }
@@ -97,12 +100,12 @@ public class Gameboard
     public void PrintSolution()
     {
         string solution = "";
-        for (int row = 0; row < currDifficulty.BoardSize; row++)
+        for (int row = 0; row < size; row++)
         {
-            for (int col = 0; col < currDifficulty.BoardSize; col++)
+            for (int col = 0; col < size; col++)
             {
                 solution += solutionBoard[row, col].ToString();
-                if (col != currDifficulty.BoardSize - 1)
+                if (col != size - 1)
                     solution += ", ";
             }
             solution += "\n";
@@ -130,26 +133,26 @@ public class Gameboard
     private bool CheckColSolution()
     {
         bool solved = true;
-        for (int col = 0; col < currDifficulty.BoardSize && solved; col++)
+        for (int col = 0; col < size && solved; col++)
         {
             int[] currColHint = GetColHints(col);
             int currHintIndex = 0;
             int consecutiveEnabled = 0;
-            for (int row = 0; row < currDifficulty.BoardSize && solved; row++)
+            for (int row = 0; row < size && solved; row++)
             {
-                if (gameboard[row, col].Enabled)
+                if (gameboard[row, col].IsOn)
                 {
                     consecutiveEnabled++;
                     if (currColHint.Length == 0 || currHintIndex >= currColHint.Length)
                     {
                         solved = false;
                     }
-                    else if (row == currDifficulty.BoardSize - 1 && (currHintIndex != currColHint.Length - 1 || consecutiveEnabled != currColHint[currHintIndex]))
+                    else if (row == size - 1 && (currHintIndex != currColHint.Length - 1 || consecutiveEnabled != currColHint[currHintIndex]))
                     {
                         solved = false;
                     }
                 }
-                else if (!gameboard[row, col].Enabled)
+                else if (!gameboard[row, col].IsOn)
                 {
                     if (consecutiveEnabled > 0)
                     {
@@ -159,7 +162,7 @@ public class Gameboard
                         }
                         else
                         {
-                            if (row == currDifficulty.BoardSize - 1 && (currHintIndex != currColHint.Length - 1 || consecutiveEnabled != currColHint[currHintIndex]))
+                            if (row == size - 1 && (currHintIndex != currColHint.Length - 1 || consecutiveEnabled != currColHint[currHintIndex]))
                             {
                                 solved = false;
                             }
@@ -174,7 +177,7 @@ public class Gameboard
                             }
                         }
                     }
-                    else if (row == currDifficulty.BoardSize - 1 && currHintIndex != currColHint.Length)
+                    else if (row == size - 1 && currHintIndex != currColHint.Length)
                     {
                         solved = false;
                     }
@@ -187,26 +190,26 @@ public class Gameboard
     private bool CheckRowSolution()
     {
         bool solved = true;
-        for (int row = 0; row < currDifficulty.BoardSize && solved; row++)
+        for (int row = 0; row < size && solved; row++)
         {
             int[] currRowHint = GetRowHints(row);
             int currHintIndex = 0;
             int consecutiveEnabled = 0;
-            for (int col = 0; col < currDifficulty.BoardSize && solved; col++)
+            for (int col = 0; col < size && solved; col++)
             {
-                if (gameboard[row, col].Enabled)
+                if (gameboard[row, col].IsOn)
                 {
                     consecutiveEnabled++;
                     if (currRowHint.Length == 0 || currHintIndex >= currRowHint.Length)
                     {
                         solved = false;
                     }
-                    else if (col == currDifficulty.BoardSize - 1 && (currHintIndex != currRowHint.Length - 1 || consecutiveEnabled != currRowHint[currHintIndex]))
+                    else if (col == size - 1 && (currHintIndex != currRowHint.Length - 1 || consecutiveEnabled != currRowHint[currHintIndex]))
                     {
                         solved = false;
                     }
                 }
-                else if (!gameboard[row, col].Enabled)
+                else if (!gameboard[row, col].IsOn)
                 {
                     if (consecutiveEnabled > 0)
                     {
@@ -216,7 +219,7 @@ public class Gameboard
                         }
                         else
                         {
-                            if (col == currDifficulty.BoardSize - 1 && (currHintIndex != currRowHint.Length - 1 || consecutiveEnabled != currRowHint[currHintIndex]))
+                            if (col == size - 1 && (currHintIndex != currRowHint.Length - 1 || consecutiveEnabled != currRowHint[currHintIndex]))
                             {
                                 solved = false;
                             }
@@ -231,7 +234,7 @@ public class Gameboard
                             }
                         }
                     }
-                    else if (col == currDifficulty.BoardSize - 1 && currHintIndex != currRowHint.Length)
+                    else if (col == size - 1 && currHintIndex != currRowHint.Length)
                     {
                         solved = false;
                     }
@@ -249,17 +252,17 @@ public class Gameboard
      */
     private void ComputeColEnabledCount()
     {
-        for (int col = 0; col < currDifficulty.BoardSize; col++)
+        for (int col = 0; col < size; col++)
         {
             int consecutiveEnabled = 0;
             colHints.Add(new Hint());
 
-            for (int row = 0; row < currDifficulty.BoardSize; row++)
+            for (int row = 0; row < size; row++)
             {
-                if (solutionBoard[row, col].Enabled)
+                if (solutionBoard[row, col].IsOn)
                 {
                     consecutiveEnabled++;
-                    if (row == currDifficulty.BoardSize - 1)
+                    if (row == size - 1)
                     {
                         colHints[col].Add(consecutiveEnabled);
                     }
@@ -293,11 +296,11 @@ public class Gameboard
     private void ComputeRowEnabledCount()
     {
         // randomly generate rowTileEnabledCount
-        for (int row = 0; row < currDifficulty.BoardSize; row++)
+        for (int row = 0; row < size; row++)
         {
             bool filled = false;
             int startingCol = 0;
-            int maxEnabled = currDifficulty.BoardSize + 1;
+            int maxEnabled = size + 1;
             rowHints.Add(new Hint());
             while (!filled)
             {
@@ -336,3 +339,5 @@ public class Gameboard
 
     #endregion
 }
+
+public enum Difficulty { Easy, Medium, Hard }

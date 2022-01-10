@@ -1,38 +1,38 @@
+/*
+ * A single cell in the gameboard table.
+ */ 
 public class Tile
 {
     #region fields
-    private bool enabled;
-    //private bool locked;
-    //private int damage;
+    private bool isOn;
     #endregion
 
     #region constructors
     public Tile()
     {
-        enabled = false;
+        isOn = false;
     }
 
-    public Tile(bool isEnabled)
+    public Tile(bool isOn)
     {
-        Enabled = isEnabled;
+        this.isOn = isOn;
     }
-
     #endregion
     
     #region properties
-    public bool Enabled { get => enabled; set => enabled = value;}
+    public bool IsOn { get => isOn;}
     #endregion
 
-    #region methods
+    #region public methods
     public bool Toggle()
     {
-        enabled = !enabled;
-        return enabled;
+        isOn = !isOn;
+        return isOn;
     }
 
     public override string ToString()
     {
-        return enabled.ToString();
+        return isOn.ToString();
     }
     #endregion
 }
