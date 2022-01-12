@@ -1,44 +1,124 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
 
+/* Gameboard
+ * Purpose:
+ *      Holds basic details about the current game.
+ *      Handles Tile instantiation, manipulation and destruction for both the solution board and the gameboard.
+ *      Computes hints that are used to solve the game.
+ */ 
 public class Gameboard
 {
     #region constants
+
     private const int initialSize = 3;
+
     #endregion
 
     #region fields
+
     private Tile[,] gameboard;
     private Tile[,] solutionBoard;
     private List<Hint> rowHints;
-    private List<Hint> colHints;
+    private List<Hint> columnHints;
     private int size;
+
     #endregion
 
     #region constructors
+
     public Gameboard()
     {
-        rowHints = new List<Hint>();
-        colHints = new List<Hint>();
-        size = (int)Difficulty.Easy + initialSize;
+        GenerateBoard((int) Difficulty.Easy);
     }
 
     public Gameboard(Difficulty difficulty)
     {
-        rowHints = new List<Hint>();
-        colHints = new List<Hint>();
-        size = (int)difficulty + initialSize;
+        GenerateBoard((int) difficulty);
+    }
+
+    #endregion
+
+    #region properties, getters and setters
+
+    public Difficulty GetDifficulty() { return (Difficulty)(size - initialSize); }
+    public int Size() { return size; }
+
+    public int[] GetColumnHints(int column) { return columnHints[column].HintValues; }
+    public int[] GetRowHints(int row) { return rowHints[row].HintValues; }
+    
+    public Tile GetTile(int row, int column) { return gameboard[row, column]; }
+    /* GetTiles
+     * Purpose:
+     *      Retrieves the Tile instances stored in the specified row or column number.
+     * Params:
+     *      IndexType indexType     Specifies whether to retrieve row or column.
+     *      int indexNumber         Specifies row or column number to fetch the Tile instances from.
+     * Returns: 
+     *      Tile[] rowTiles         All the the Tile instances stored in the specified column number. 
+     */
+    public Tile[] GetTiles(IndexType indexType, int indexNumber)
+    {
+        Tile[] tiles = new Tile[size];
+        int rowIndex = 0;
+        int colIndex = 0;
+        
+        for (int index = 0; index < size; index++)
+        {
+            if (indexType == IndexType.Row)
+            {
+                rowIndex = indexNumber;
+                colIndex = index;
+            }
+            else if (indexType == IndexType.Column)
+            {
+                rowIndex = index;
+                colIndex = indexNumber;
+            }
+            else
+                throw new System.Exception("Unspecified index type.");
+
+            tiles[index] = gameboard[rowIndex, colIndex];
+        }
+        return tiles;
     }
     #endregion
+    
+    #region interface
 
-    #region properties
-    public int Size() { return size; }
-    public Tile GetTile(int row, int col) { return gameboard[row, col]; }
-    public int[] GetRowHints(int row) { return rowHints[row].HintValues; }
-    public int[] GetColHints(int col) { return colHints[col].HintValues; }
-    #endregion
-
-    #region public methods
+    /* GenerateBoard
+     * Purpose:
+     *      Sets up a new game to play.
+     *      Initializes the gameboard and solution board.
+     *      Generates the solution to the game.
+     *      Computes the hints for the game.
+     */
+    public void GenerateBoard(int difficulty)
+    {
+        //TODO: safely destroy old board if it exists
+        if (difficulty >= 0 && difficulty < System.Enum.GetValues(typeof(Difficulty)).Length)
+            InitializeBoards((Difficulty) difficulty);
+        else
+            InitializeBoards(Difficulty.Easy);
+        GenerateSolution();
+        GenerateHints(IndexType.Row);
+        GenerateHints(IndexType.Column);
+    }
+    
+    public void ToggleTile(Tile tile)
+    {
+        tile.Toggle();
+        // everytime a Tile is toggled, you want to check the win condition
+        // TODO: move solution checking to GameboardController
+        if (CheckSolution())
+            Debug.Log("You Win!");
+    }
+    
+    /* ClearBoard
+     * Purpose:
+     *      Sets all Tiles within the gameboard field to isOn=false.
+     */ 
     public void ClearBoard()
     {
         if (gameboard != null)
@@ -47,14 +127,59 @@ public class Gameboard
             {
                 for (int row = 0; row < size; row++)
                 {
-                    if (gameboard[row, col].IsOn == true)
-                        gameboard[row, col].Toggle();
+                    gameboard[row, col]?.Reset();
                 }
             }
         }
+        else
+        {
+            Debug.Log("When trying to clear the board, Gameboard instance was null.");
+        }
     }
 
-    public Tile[,] CreateBoard()
+    public void PrintSolution()
+    {
+        StringBuilder solution = new StringBuilder();
+        for (int row = 0; row < size; row++)
+        {
+            for (int col = 0; col < size; col++)
+            {
+                solution.Append(solutionBoard[row, col].ToString());
+                if (col != size - 1)
+                    solution.Append(", ");
+            }
+            solution.Append("\n");
+        }
+        Debug.Log(solution.ToString());
+    }
+
+    #endregion
+    
+    #region initialization
+
+    /* InitializeBoard
+     * Purpose:
+     *      Initializes class fields.
+     * Params:
+     *      Difficulty difficulty
+     *          Used to determine board size.
+     */ 
+    private void InitializeBoards(Difficulty difficulty)
+    {
+        rowHints = new List<Hint>();
+        columnHints = new List<Hint>();
+        size = (int)difficulty + initialSize;
+        gameboard = CreateBoard();
+        solutionBoard = CreateBoard();
+    }
+    
+    /* CreateBoard
+     * Purpose:
+     *      Initializes 2D Tile array and returns result.
+     * Returns: 
+     *      Tile[,] board       a 2D array that stores initiated Tile objects.
+     */ 
+    private Tile[,] CreateBoard()
     {
         Tile[,] board = new Tile[size, size];
 
@@ -68,240 +193,22 @@ public class Gameboard
         return board;
     }
 
-    public void GenerateSolution()
-    {
-        Debug.Log("Generating solution for board...");
-        gameboard = CreateBoard();
-        solutionBoard = CreateBoard();
-        ComputeEnabledCounts();
-        Debug.Log("Solution generation completed.");
-    }
-
-    public Tile[] GetRow(int rowNum)
-    {
-        Tile[] rowTiles = new Tile[size];
-        for (int col = 0; col < size; col++)
-        {
-            rowTiles[col] = gameboard[rowNum, col];
-        }
-        return rowTiles;
-    }
-
-    public Tile[] GetCol(int colNum)
-    {
-        Tile[] colTiles = new Tile[size];
-        for (int row = 0; row < size; row++)
-        {
-            colTiles[row] = gameboard[row, colNum];
-        }
-        return colTiles;
-    }
-
-    public void PrintSolution()
-    {
-        string solution = "";
-        for (int row = 0; row < size; row++)
-        {
-            for (int col = 0; col < size; col++)
-            {
-                solution += solutionBoard[row, col].ToString();
-                if (col != size - 1)
-                    solution += ", ";
-            }
-            solution += "\n";
-        }
-        Debug.Log(solution);
-    }
-
-    public void ToggleTile(Tile tile)
-    {
-        tile.Toggle();
-        if (CheckSolution())
-            Debug.Log("You Win!");
-    }
     #endregion
-
-    #region private methods
-
-    #region solution checking helper methods
-
-    private bool CheckSolution()
-    {
-        return CheckColSolution() && CheckRowSolution();
-    }
     
-    private bool CheckColSolution()
-    {
-        bool solved = true;
-        for (int col = 0; col < size && solved; col++)
-        {
-            int[] currColHint = GetColHints(col);
-            int currHintIndex = 0;
-            int consecutiveEnabled = 0;
-            for (int row = 0; row < size && solved; row++)
-            {
-                if (gameboard[row, col].IsOn)
-                {
-                    consecutiveEnabled++;
-                    if (currColHint.Length == 0 || currHintIndex >= currColHint.Length)
-                    {
-                        solved = false;
-                    }
-                    else if (row == size - 1 && (currHintIndex != currColHint.Length - 1 || consecutiveEnabled != currColHint[currHintIndex]))
-                    {
-                        solved = false;
-                    }
-                }
-                else if (!gameboard[row, col].IsOn)
-                {
-                    if (consecutiveEnabled > 0)
-                    {
-                        if (currColHint.Length == 0 || currHintIndex >= currColHint.Length)
-                        {
-                            solved = false;
-                        }
-                        else
-                        {
-                            if (row == size - 1 && (currHintIndex != currColHint.Length - 1 || consecutiveEnabled != currColHint[currHintIndex]))
-                            {
-                                solved = false;
-                            }
-                            else if (consecutiveEnabled != currColHint[currHintIndex])
-                            {
-                                solved = false;
-                            }
-                            else if (consecutiveEnabled == currColHint[currHintIndex])
-                            {
-                                currHintIndex++;
-                                consecutiveEnabled = 0;
-                            }
-                        }
-                    }
-                    else if (row == size - 1 && currHintIndex != currColHint.Length)
-                    {
-                        solved = false;
-                    }
-                }
-            }
-        }
-        return solved;
-    }
+    #region solution generation
 
-    private bool CheckRowSolution()
-    {
-        bool solved = true;
-        for (int row = 0; row < size && solved; row++)
-        {
-            int[] currRowHint = GetRowHints(row);
-            int currHintIndex = 0;
-            int consecutiveEnabled = 0;
-            for (int col = 0; col < size && solved; col++)
-            {
-                if (gameboard[row, col].IsOn)
-                {
-                    consecutiveEnabled++;
-                    if (currRowHint.Length == 0 || currHintIndex >= currRowHint.Length)
-                    {
-                        solved = false;
-                    }
-                    else if (col == size - 1 && (currHintIndex != currRowHint.Length - 1 || consecutiveEnabled != currRowHint[currHintIndex]))
-                    {
-                        solved = false;
-                    }
-                }
-                else if (!gameboard[row, col].IsOn)
-                {
-                    if (consecutiveEnabled > 0)
-                    {
-                        if (currRowHint.Length == 0 || currHintIndex >= currRowHint.Length)
-                        {
-                            solved = false;
-                        }
-                        else
-                        {
-                            if (col == size - 1 && (currHintIndex != currRowHint.Length - 1 || consecutiveEnabled != currRowHint[currHintIndex]))
-                            {
-                                solved = false;
-                            }
-                            else if (consecutiveEnabled != currRowHint[currHintIndex])
-                            {
-                                solved = false;
-                            }
-                            else if (consecutiveEnabled == currRowHint[currHintIndex])
-                            {
-                                currHintIndex++;
-                                consecutiveEnabled = 0;
-                            }
-                        }
-                    }
-                    else if (col == size - 1 && currHintIndex != currRowHint.Length)
-                    {
-                        solved = false;
-                    }
-                }
-            }
-        }
-        return solved;
-    }
-    #endregion
-
-    #region solution generation helper methods
-    /*
-     * Computes the column hints
-     * Uses the output from ComputeRowEnabledCount() to determine the column hints.
+    /* GenerateSolution
+     * Purpose:
+     *      Randomly generates the number of rows enabled in the solutionBoard.
+     *      Randomizes by rows.
      */
-    private void ComputeColEnabledCount()
+    private void GenerateSolution()
     {
-        for (int col = 0; col < size; col++)
-        {
-            int consecutiveEnabled = 0;
-            colHints.Add(new Hint());
-
-            for (int row = 0; row < size; row++)
-            {
-                if (solutionBoard[row, col].IsOn)
-                {
-                    consecutiveEnabled++;
-                    if (row == size - 1)
-                    {
-                        colHints[col].Add(consecutiveEnabled);
-                    }
-                }
-                else if (consecutiveEnabled >= 1)
-                {
-                    colHints[col].Add(consecutiveEnabled);
-                    consecutiveEnabled = 0;
-                }
-            }
-        }
-    }
-
-    /*
-     * Generates the solution to the current gameboard.
-     */ 
-    private void ComputeEnabledCounts()
-    {
-        Debug.Log("Computing rows...");
-        ComputeRowEnabledCount();
-        Debug.Log("Row computation complete.");
-        Debug.Log("Computing columns...");
-        ComputeColEnabledCount();
-        Debug.Log("Column computation complete.");
-    }
-
-    /*
-     * Randomly generates the number of rows enabled in the solution.
-     * Creates the row hints.
-     */ 
-    private void ComputeRowEnabledCount()
-    {
-        // randomly generate rowTileEnabledCount
         for (int row = 0; row < size; row++)
         {
             bool filled = false;
             int startingCol = 0;
             int maxEnabled = size + 1;
-            rowHints.Add(new Hint());
             while (!filled)
             {
                 // logic for randomly generating row tile count enabled
@@ -311,33 +218,190 @@ public class Gameboard
                 {
                     filled = true;
                 }
-                if (amountEnabled > 0)
-                {
-                    rowHints[row].Add(amountEnabled);
-                }
-                
+
                 // TODO: add a random startingCol to place
 
-                EnableSolutionTileRows(row, startingCol, amountEnabled);
+                ToggleSolutionBoardRow(row, startingCol, amountEnabled);
                 startingCol += amountEnabled + 1;
             }
         }
     }
 
-    /*
-     * Solves the solution gameboard which is used to determine the column hints.
-     */ 
-    private void EnableSolutionTileRows(int rowIndex, int colIndex, int amountEnabled)
+    /* ToggleSolutionBoardRow
+     * Purpose:
+     *      Solves the solution gameboard which is used to determine the column hints.
+     */
+    private void ToggleSolutionBoardRow(int rowIndex, int colIndex, int amountEnabled)
     {
-        //Debug.Log("Current rowIndex is " + rowIndex + ", colIndex is " + colIndex + " and amountEnabled is " + amountEnabled);
         for (int index = 0; index < amountEnabled; index++)
         {
             solutionBoard[rowIndex, colIndex + index].Toggle();
         }
     }
-    #endregion 
 
     #endregion
+
+    #region hints generation
+
+    /* GenerateHints
+     * Purpose:
+     *      To compute the hints for the specified List in the game.
+     * Params:
+     *      IndexType indexType     Specifies whether row hints or column hints are being computed.
+     */ 
+    private void GenerateHints(IndexType indexType)
+    {
+        int rowIndex = 0;
+        int columnIndex = 0;
+        List<Hint> hintList = null;
+
+        // determines the hint list to manipulate
+        if (indexType == IndexType.Row)
+            hintList = rowHints;
+        else if (indexType == IndexType.Column)
+            hintList = columnHints;
+        else
+            throw new System.Exception("Unspecified index type.");
+
+        for (int outerIndex = 0; outerIndex < size; outerIndex++)
+        {
+            int consecutiveIsOn = 0;
+            hintList.Add(new Hint());
+
+            for (int innerIndex = 0; innerIndex < size; innerIndex++)
+            {
+                // rowIndex and columnIndex change depending on the indexType
+                if (indexType == IndexType.Row)
+                {
+                    rowIndex = outerIndex;
+                    columnIndex = innerIndex;
+                }
+                else
+                {
+                    rowIndex = innerIndex;
+                    columnIndex = outerIndex;
+                }
+                // cases for computing hints
+                if (solutionBoard[rowIndex, columnIndex].IsOn)
+                {
+                    consecutiveIsOn++;
+                    if (innerIndex == size - 1)
+                    {
+                        hintList[outerIndex].Add(consecutiveIsOn);
+                    }
+                }
+                else if (consecutiveIsOn >= 1)
+                {
+                    hintList[outerIndex].Add(consecutiveIsOn);
+                    consecutiveIsOn = 0;
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region solution checking
+
+    private bool CheckSolution()
+    {
+        return CheckSolution(IndexType.Row) && CheckSolution(IndexType.Column);
+    }
+
+    /* CheckSolution
+     * Purpose:
+     *      Checks whether or not all columns or rows match the hints.
+     * Params:
+     *      IndexType indexType     Determines whether the row or column hints are being checked.
+     * Returns:
+     *      bool solved             True if all Tile isOn fields match the hints.
+     */ 
+    private bool CheckSolution(IndexType indexType)
+    {
+        bool solved = true;
+        int[] currHint = null;
+        int rowIndex = 0;
+        int colIndex = 0;
+
+        for (int outerIndex = 0; outerIndex < size && solved; outerIndex++)
+        {
+            int currHintIndex = 0;
+            int consecutiveIsOn = 0;
+
+            if(indexType == IndexType.Row)
+                currHint = GetRowHints(outerIndex);
+            else if (indexType == IndexType.Column)
+                currHint = GetColumnHints(outerIndex);
+            else
+                throw new System.Exception("Unspecified index type.");
+
+            for (int innerIndex = 0; innerIndex < size && solved; innerIndex++)
+            {
+                if (indexType == IndexType.Row)
+                {
+                    rowIndex = outerIndex;
+                    colIndex = innerIndex;
+                }
+                else
+                {
+                    rowIndex = innerIndex;
+                    colIndex = outerIndex;
+                }
+
+                if (gameboard[rowIndex, colIndex].IsOn)
+                {
+                    consecutiveIsOn++;
+                    if (currHint.Length == 0 || currHintIndex >= currHint.Length)
+                    {
+                        solved = false;
+                    }
+                    else if (innerIndex == size - 1 && (currHintIndex != currHint.Length - 1 || consecutiveIsOn != currHint[currHintIndex]))
+                    {
+                        solved = false;
+                    }
+                }
+                else if (!gameboard[rowIndex, colIndex].IsOn)
+                {
+                    if (consecutiveIsOn > 0)
+                    {
+                        if (currHint.Length == 0 || currHintIndex >= currHint.Length)
+                        {
+                            solved = false;
+                        }
+                        else
+                        {
+                            if (innerIndex == size - 1 && (currHintIndex != currHint.Length - 1 || consecutiveIsOn != currHint[currHintIndex]))
+                            {
+                                solved = false;
+                            }
+                            else if (consecutiveIsOn != currHint[currHintIndex])
+                            {
+                                solved = false;
+                            }
+                            else if (consecutiveIsOn == currHint[currHintIndex])
+                            {
+                                currHintIndex++;
+                                consecutiveIsOn = 0;
+                            }
+                        }
+                    }
+                    else if (innerIndex == size - 1 && currHintIndex != currHint.Length)
+                    {
+                        solved = false;
+                    }
+                }
+            }
+
+        }
+
+        return solved;
+    }
+    
+    #endregion
+    
+
 }
 
 public enum Difficulty { Easy, Medium, Hard }
+
+public enum IndexType { Row, Column }

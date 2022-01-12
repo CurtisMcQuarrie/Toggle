@@ -2,24 +2,21 @@ using UnityEngine;
 
 public class ToggleCommand : ICommand
 {
-    private Gameboard gameboard;
-    private Tile tile;
+    private TileObject tile;
 
-    public ToggleCommand(Gameboard gameboard, Tile tile)
+    public ToggleCommand(TileObject tileObject)
     {
-        this.gameboard = gameboard;
-        this.tile = tile;
+        tile = tileObject;
     }
 
     public void Execute()
     {
         PerformToggle();
-        //Debug.Log("Enabled state set to " + tile.Enabled);
     }
 
     public void Redo()
     {
-        throw new System.NotImplementedException();
+        PerformToggle();
     }
 
     public void Undo()
@@ -29,9 +26,6 @@ public class ToggleCommand : ICommand
 
     private void PerformToggle()
     {
-        if (gameboard != null)
-        {
-            gameboard.ToggleTile(tile);
-        }
+        tile?.PerformToggle();
     }
 }

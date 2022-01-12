@@ -1,13 +1,18 @@
-/*
- * A single cell in the gameboard table.
+/* Tile
+ * Purpose:
+ *      Control its own state within the gameboard.
+ *      Basic game piece that the user manipulates that state of.
  */ 
 public class Tile
 {
     #region fields
+
     private bool isOn;
+
     #endregion
 
     #region constructors
+
     public Tile()
     {
         isOn = false;
@@ -17,22 +22,38 @@ public class Tile
     {
         this.isOn = isOn;
     }
+
     #endregion
     
     #region properties
+
     public bool IsOn { get => isOn;}
+    
     #endregion
 
-    #region public methods
+    #region isOn manipulation
+
     public bool Toggle()
     {
         isOn = !isOn;
         return isOn;
     }
 
+    public bool Reset()
+    {
+        if (isOn)
+            isOn = false;
+        return isOn;
+    }
+
+    #endregion
+
+    #region utility
+
     public override string ToString()
     {
         return isOn.ToString();
     }
+
     #endregion
 }

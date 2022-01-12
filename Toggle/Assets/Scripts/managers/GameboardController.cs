@@ -33,13 +33,12 @@ public class GameboardController : MonoBehaviour
     #region methods
     public void CreateBoard()
     {
-        gameboard.GenerateSolution();
         gameboardObject.CreateSpacerPanel(gameboardPanelTransform);
 
         // instantiate col hints
         for (int col = 0; col < gameboard.Size(); col++)
         {
-            hintsObject.CreateHint(gameboard.GetColHints(col), HintsPrefabs.COL, gameboardPanelTransform);
+            hintsObject.CreateHint(gameboard.GetColumnHints(col), HintsPrefabs.COL, gameboardPanelTransform);
 
             //Debug
             //int[] hints = gameboard.GetColHints(col);
@@ -57,7 +56,7 @@ public class GameboardController : MonoBehaviour
         for (int row = 0; row < gameboard.Size(); row++)
         {
             hintsObject.CreateHint(gameboard.GetRowHints(row), HintsPrefabs.ROW, gameboardPanelTransform); // instantiate hint for row
-            GameObject[] rowTileObjects = gameboardObject.CreateBoardRow(gameboard.GetRow(row), gameboardPanelTransform); // instantiate tiles
+            GameObject[] rowTileObjects = gameboardObject.CreateBoardRow(gameboard.GetTiles(IndexType.Row, row), gameboardPanelTransform); // instantiate tiles
             ConnectRowTileObjects(rowTileObjects, row); // hookup TileObject to gameboard
         }
 
@@ -73,7 +72,9 @@ public class GameboardController : MonoBehaviour
     public void Reroll()
     {
         Debug.Log("Rerolling Board...");
-        gameboard.GenerateSolution();
+        Difficulty currentDifficulty = gameboard.GetDifficulty();
+        // TODO: destroy current board safely
+        gameboard = new Gameboard(currentDifficulty);
         gameboard.PrintSolution();
     }
 
@@ -82,8 +83,7 @@ public class GameboardController : MonoBehaviour
         for (int col = 0; col < rowTileObjects.Length; col++)
         {
             TileObject tileObject = rowTileObjects[col].GetComponent<TileObject>();
-            tileObject.Gameboard = gameboard;
-            tileObject.Tile = gameboard.GetTile(rowNum, col);
+            tileObject.ConnectTile(gameboard, gameboard.GetTile(rowNum, col));
         }
     }
     #endregion

@@ -262,8 +262,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bee4050fc9383074db2a9db1ee1812fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enabledColor: {r: 0.20038268, g: 0.4664052, b: 0.745283, a: 1}
-  disabledColor: {r: 1, g: 1, b: 1, a: 1}
+  isOffColorBlock:
+    m_NormalColor: {r: 0.70980394, g: 0.89411765, b: 0.54901963, a: 1}
+    m_HighlightedColor: {r: 0.70980394, g: 0.89411765, b: 0.54901963, a: 1}
+    m_PressedColor: {r: 0.6, g: 0.8509804, b: 0.54901963, a: 1}
+    m_SelectedColor: {r: 0.70980394, g: 0.89411765, b: 0.54901963, a: 1}
+    m_DisabledColor: {r: 0.09411765, g: 0.30588236, b: 0.46666667, a: 1}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0
+  isOnColorBlock:
+    m_NormalColor: {r: 0.4627451, g: 0.78431374, b: 0.5764706, a: 1}
+    m_HighlightedColor: {r: 0.4627451, g: 0.78431374, b: 0.5764706, a: 1}
+    m_PressedColor: {r: 0.32156864, g: 0.7137255, b: 0.6039216, a: 1}
+    m_SelectedColor: {r: 0.4627451, g: 0.78431374, b: 0.5764706, a: 1}
+    m_DisabledColor: {r: 0.09411765, g: 0.30588236, b: 0.46666667, a: 1}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0
 --- !u!114 &-6816845083592397821
 MonoBehaviour:
   m_ObjectHideFlags: 0

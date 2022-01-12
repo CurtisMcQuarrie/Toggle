@@ -1,80 +1,85 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/* TileObject
+ * Purpose:
+ *      Attached to each Toggle on the gameboard.
+ *      Responsible for allowing player to change the board state.
+ */
+[RequireComponent(typeof(Toggle))]
 public class TileObject : MonoBehaviour
 {
     #region fields
     private Gameboard gameboard;
-    private Toggle toggle;
     private Tile tile;
-    public List<ICommand> commands;
-    public Color enabledColor;
-    public Color disabledColor;
+    private Toggle toggle; // TODO: change to button.
+    [Header("Is Off Color Block")] // TODO: change to a ColorChange component
+    public ColorBlock isOffColorBlock;
+    [Header("Is On Color Block")]
+    public ColorBlock isOnColorBlock;
+
     #endregion
 
     #region properties
-    public Tile Tile { set => tile = value; }
-    public Gameboard Gameboard { set => gameboard = value; }
+
+    public Gameboard Gameboard { get => gameboard; }
+    public Tile Tile { get => tile; }
+    public Toggle Toggle { get => toggle; }
+
     #endregion
 
     #region monobehaviour
-    void Awake()
-    {
-        commands = new List<ICommand>();   
-    }
 
-    // Start is called before the first frame update
     void Start()
     {
-        toggle = this.GetComponent<Toggle>();
+        toggle = GetComponent<Toggle>();
+        ChangeColor(false);
         toggle.onValueChanged.AddListener(OnToggleValueChange);
     }
+
     #endregion
 
-    #region methods
-    public void SetupCommands()
+    #region interface
+
+    /* ConnectTile
+     * Purpose:
+     *      Acts as a setter for this gameobject since Monobehaviour does not handle constructors well.
+     */
+    public void ConnectTile(Gameboard gameboard, Tile tile)
     {
         if (gameboard != null && tile != null)
         {
-            commands.Add(new ToggleCommand(gameboard, tile));
+            this.gameboard = gameboard;
+            this.tile = tile;
         }
         else
-        {
-            Debug.Log("Either gameboard or tile fields are null for this tile.");
-        }
+            throw new System.Exception("Could not connect TileObject to gameboard and/or tile");
     }
 
-    private void ExecuteCommands()
-    { 
-        ToggleCommand toggleCommand = new ToggleCommand(gameboard, tile);
+    public void PerformToggle()
+    {
+        gameboard?.ToggleTile(tile);
+        ChangeColor(tile.IsOn);
+    }
+
+    #endregion
+    //TODO: change to onclick
+    private void OnToggleValueChange(bool isOn)
+    {
+        ToggleCommand toggleCommand = new ToggleCommand(this);
         CommandManager.Instance.AddCommand(toggleCommand);
         toggleCommand.Execute();
     }
 
-    private void OnToggleValueChange(bool isOn)
-    {
-        ExecuteCommands();
-        ChangeColor(isOn);
-    }
-
     private void ChangeColor(bool isOn)
     {
-        ColorBlock colorBlock = toggle.colors;
         if (isOn)
         {
-            colorBlock.normalColor = enabledColor;
-            colorBlock.highlightedColor = enabledColor;
-            colorBlock.selectedColor = enabledColor;
+            toggle.colors = isOnColorBlock;
         }
         else
         {
-            colorBlock.normalColor = disabledColor;
-            colorBlock.highlightedColor = disabledColor;
-            colorBlock.selectedColor = disabledColor;
+            toggle.colors = isOffColorBlock;
         }
-        toggle.colors = colorBlock;
     }
-    #endregion
 }
