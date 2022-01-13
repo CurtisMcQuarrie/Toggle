@@ -13,9 +13,13 @@ public class GameboardController : MonoBehaviour
     #endregion
 
     #region monobehaviour
-    void Start()
+    void Awake()
     {
         gameboard = new Gameboard();
+    }
+
+    void Start()
+    {
         hintsObject = GetComponent<HintsObject>();
         gameboardObject = GetComponent<GameboardObject>();
         if (hintsObject == null)
@@ -84,6 +88,9 @@ public class GameboardController : MonoBehaviour
         {
             TileObject tileObject = rowTileObjects[col].GetComponent<TileObject>();
             tileObject.ConnectTile(gameboard, gameboard.GetTile(rowNum, col));
+
+            ITileObjectSubscriber colorBlockChangeSubscriber = rowTileObjects[col].GetComponent<ButtonColorBlockChange>();
+            tileObject.Subscribe(colorBlockChangeSubscriber);
         }
     }
     #endregion

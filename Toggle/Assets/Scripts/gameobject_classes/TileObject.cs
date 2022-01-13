@@ -1,22 +1,22 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 /* TileObject
  * Purpose:
- *      Attached to each Toggle on the gameboard.
+ *      Attached to each Button on the gameboard.
  *      Responsible for allowing player to change the board state.
  */
-[RequireComponent(typeof(Toggle))]
+ // TODO: Make it a publisher
+[RequireComponent(typeof(Button))]
 public class TileObject : MonoBehaviour
 {
     #region fields
+
     private Gameboard gameboard;
     private Tile tile;
-    private Toggle toggle; // TODO: change to button.
-    [Header("Is Off Color Block")] // TODO: change to a ColorChange component
-    public ColorBlock isOffColorBlock;
-    [Header("Is On Color Block")]
-    public ColorBlock isOnColorBlock;
+    private Button button;
+    private List<ITileObjectSubscriber> subscribers;
 
     #endregion
 
@@ -24,17 +24,20 @@ public class TileObject : MonoBehaviour
 
     public Gameboard Gameboard { get => gameboard; }
     public Tile Tile { get => tile; }
-    public Toggle Toggle { get => toggle; }
 
     #endregion
 
     #region monobehaviour
+    void Awake()
+    {
+        subscribers = new List<ITileObjectSubscriber>();
+    }
+
 
     void Start()
     {
-        toggle = GetComponent<Toggle>();
-        ChangeColor(false);
-        toggle.onValueChanged.AddListener(OnToggleValueChange);
+        button = GetComponent<Button>();
+        button.onClick.AddListener(TaskOnClick);
     }
 
     #endregion
@@ -58,28 +61,56 @@ public class TileObject : MonoBehaviour
 
     public void PerformToggle()
     {
-        gameboard?.ToggleTile(tile);
-        ChangeColor(tile.IsOn);
+        if (gameboard != null && tile != null)
+        {
+            gameboard?.ToggleTile(tile);
+            NotifySubscribers();
+        }
+        else
+            throw new System.Exception("Could not connect TileObject to gameboard and/or tile");
     }
 
     #endregion
-    //TODO: change to onclick
-    private void OnToggleValueChange(bool isOn)
+
+    #region OnClick methods
+
+    private void TaskOnClick()
     {
+        // send command
         ToggleCommand toggleCommand = new ToggleCommand(this);
         CommandManager.Instance.AddCommand(toggleCommand);
         toggleCommand.Execute();
+        // TODO: notify subscribers
     }
 
-    private void ChangeColor(bool isOn)
+    #endregion
+
+    #region publisher methods
+
+    public void Subscribe(ITileObjectSubscriber subscriber)
     {
-        if (isOn)
+        if (subscriber != null)
         {
-            toggle.colors = isOnColorBlock;
-        }
-        else
-        {
-            toggle.colors = isOffColorBlock;
+            subscribers.Add(subscriber);
         }
     }
+
+    public void UnSubscribe(ITileObjectSubscriber subscriber)
+    {
+        if (subscriber != null)
+        {
+            subscribers.Remove(subscriber);
+        }
+    }
+
+    public void NotifySubscribers()
+    {
+        foreach (ITileObjectSubscriber subscriber in subscribers)
+        {
+            subscriber.Update(this);
+        }
+    }
+
+    #endregion
+
 }
