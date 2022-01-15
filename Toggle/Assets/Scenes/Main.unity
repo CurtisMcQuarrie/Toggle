@@ -917,6 +917,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fbc590a9acbe0f4f803f76e0e4af3b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  difficulty: 0
 --- !u!1001 &704026549
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2145,6 +2146,7 @@ GameObject:
   - component: {fileID: 1370440607}
   - component: {fileID: 1370440604}
   - component: {fileID: 1370440606}
+  - component: {fileID: 1370440608}
   m_Layer: 0
   m_Name: GameBoardController
   m_TagString: Gameboard
@@ -2219,7 +2221,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfefe9ab900baef48bf8b0a445afeda5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameboardPanelTransform: {fileID: 1021643742}
+  gameboardTransform: {fileID: 1021643742}
+--- !u!114 &1370440608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1370440603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcce45d94b95f7b4aa416de0e6bdf4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hintSprites: []
+  dividerPrefabs:
+  - {fileID: 0}
+  - {fileID: 0}
+  hintPanelPrefabs:
+  - {fileID: 0}
+  - {fileID: 0}
+  hintPrefab: {fileID: 0}
+  spacerPrefab: {fileID: 0}
+  tilePrefab: {fileID: 0}
 --- !u!1 &1455933441
 GameObject:
   m_ObjectHideFlags: 0

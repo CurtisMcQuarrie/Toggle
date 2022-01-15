@@ -4,19 +4,26 @@ using UnityEngine;
 /* GameManager
  * Purpose:
  *      Handles UI interactions.
- *      Scene Changes.
+ *      Handles Scene Changes.
  */ 
 public class GameManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    #region fields
 
-    // Update is called once per frame
+    public Difficulty difficulty;
+
+    #endregion
+
+    #region monobehaviour
+    void Awake()
+    {
+        DontDestroyOnLoad(this); // make it persist between scenes
+        difficulty = Difficulty.Easy;
+    }
+    
     void Update()
     {
         
     }
+    #endregion
 }

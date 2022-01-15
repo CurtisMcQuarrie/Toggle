@@ -3,13 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/* GameboardController
+ * Purpose:
+ *      Uses GameboardGUI to instantiate gameboard prefabs and then connects them to the logic. 
+ */
+ [RequireComponent(typeof(GameboardGUI))]
 public class GameboardController : MonoBehaviour
 {
     #region fields
+
+    private List<GameObject> rowHints;
+    private List<GameObject> columnHints;
+    private List<List<GameObject>> tileRow;
+
     private Gameboard gameboard;
-    private HintsObject hintsObject;
-    private GameboardObject gameboardObject;
-    public Transform gameboardPanelTransform;
+    private HintsObject hintsObject; // TODO: remove
+    private GameboardObject gameboardObject; // TODO: remove
+    public Transform gameboardTransform;
+    private GameManager gameManager;
+    private GameboardGUI gui;
+    
     #endregion
 
     #region monobehaviour
@@ -18,8 +31,10 @@ public class GameboardController : MonoBehaviour
         gameboard = new Gameboard();
     }
 
+    // grabs components to instantiate prefabs
     void Start()
     {
+        //  TODO: remove block
         hintsObject = GetComponent<HintsObject>();
         gameboardObject = GetComponent<GameboardObject>();
         if (hintsObject == null)
@@ -30,19 +45,24 @@ public class GameboardController : MonoBehaviour
         {
             Debug.Log("Missing GameboardObject on Gameboard_Controller.");
         }
+        
+        //gameManager = FindObjectOfType<GameManager>();
+        //gui = GetComponent<GameboardGUI>();
+        //SetDifficulty(gameManager.difficulty);
         CreateBoard();
     }
     #endregion
 
     #region methods
+    // instantiates board gui and connects Tile instances to tile prefabs
     public void CreateBoard()
     {
-        gameboardObject.CreateSpacerPanel(gameboardPanelTransform);
+        gameboardObject.CreateSpacerPanel(gameboardTransform);
 
         // instantiate col hints
         for (int col = 0; col < gameboard.Size(); col++)
         {
-            hintsObject.CreateHint(gameboard.GetColumnHints(col), HintsPrefabs.COL, gameboardPanelTransform);
+            hintsObject.CreateHint(gameboard.GetColumnHints(col), HintsPrefabs.COL, gameboardTransform);
 
             //Debug
             //int[] hints = gameboard.GetColHints(col);
@@ -59,20 +79,22 @@ public class GameboardController : MonoBehaviour
         // instantiate row hints and tiles simultaneously
         for (int row = 0; row < gameboard.Size(); row++)
         {
-            hintsObject.CreateHint(gameboard.GetRowHints(row), HintsPrefabs.ROW, gameboardPanelTransform); // instantiate hint for row
-            GameObject[] rowTileObjects = gameboardObject.CreateBoardRow(gameboard.GetTiles(IndexType.Row, row), gameboardPanelTransform); // instantiate tiles
+            hintsObject.CreateHint(gameboard.GetRowHints(row), HintsPrefabs.ROW, gameboardTransform); // instantiate hint for row
+            GameObject[] rowTileObjects = gameboardObject.CreateBoardRow(gameboard.GetTiles(IndexType.Row, row), gameboardTransform); // instantiate tiles
             ConnectRowTileObjects(rowTileObjects, row); // hookup TileObject to gameboard
         }
 
         gameboard.PrintSolution();
     }
 
-    public void SetDifficulty(int difficulty)
+    // sets the difficulty
+    public void SetDifficulty(Difficulty difficulty)
     {
-        Debug.Log("Set difficulty to " + (Difficulty)difficulty);
-        gameboard = new Gameboard((Difficulty)difficulty);
+        Debug.Log("Set difficulty to " + difficulty);
+        gameboard = new Gameboard(difficulty);
     }
 
+    // creates a new gameboard
     public void Reroll()
     {
         Debug.Log("Rerolling Board...");
@@ -81,6 +103,7 @@ public class GameboardController : MonoBehaviour
         gameboard = new Gameboard(currentDifficulty);
         gameboard.PrintSolution();
     }
+
 
     private void ConnectRowTileObjects(GameObject[] rowTileObjects, int rowNum)
     {
@@ -92,6 +115,25 @@ public class GameboardController : MonoBehaviour
             ITileObjectSubscriber colorBlockChangeSubscriber = rowTileObjects[col].GetComponent<ButtonColorBlockChange>();
             tileObject.Subscribe(colorBlockChangeSubscriber);
         }
+    }
+    #endregion
+
+    private void AddToHintList(GameObject hintPanel, IndexType indexType)
+    {
+        if (indexType == IndexType.Row)
+        {
+            rowHints.Add(hintPanel);
+        }
+        else if (indexType == IndexType.Column)
+        {
+            columnHints.Add(hintPanel);
+        }
+    }
+
+    #region destruction
+    private void OnDestroy()
+    {
+        
     }
     #endregion
 }

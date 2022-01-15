@@ -7,7 +7,6 @@ using UnityEngine.UI;
  *      Attached to each Button on the gameboard.
  *      Responsible for allowing player to change the board state.
  */
- // TODO: Make it a publisher
 [RequireComponent(typeof(Button))]
 public class TileObject : MonoBehaviour
 {
@@ -63,7 +62,7 @@ public class TileObject : MonoBehaviour
     {
         if (gameboard != null && tile != null)
         {
-            gameboard?.ToggleTile(tile);
+            gameboard?.Toggle(tile);
             NotifySubscribers();
         }
         else
@@ -76,11 +75,9 @@ public class TileObject : MonoBehaviour
 
     private void TaskOnClick()
     {
-        // send command
         ToggleCommand toggleCommand = new ToggleCommand(this);
         CommandManager.Instance.AddCommand(toggleCommand);
         toggleCommand.Execute();
-        // TODO: notify subscribers
     }
 
     #endregion
@@ -113,4 +110,16 @@ public class TileObject : MonoBehaviour
 
     #endregion
 
+    #region destruction
+
+    private void OnDestroy()
+    {
+        gameboard = null;
+        tile = null;
+        button = null;
+        subscribers.Clear();
+        subscribers = null;
+    }
+
+    #endregion
 }

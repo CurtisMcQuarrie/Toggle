@@ -18,8 +18,10 @@ public class Gameboard
 
     #region fields
 
-    private Tile[,] gameboard;
-    private Tile[,] solutionBoard;
+    private Tile[,] gameboard; // TODO: change to list
+    private List<List<Tile>> gameboardList;
+    private Tile[,] solutionBoard; // TODO: change to list
+    private List<List<Tile>> solutionBoardList;
     private List<Hint> rowHints;
     private List<Hint> columnHints;
     private int size;
@@ -30,12 +32,12 @@ public class Gameboard
 
     public Gameboard()
     {
-        GenerateBoard((int) Difficulty.Easy);
+        GenerateBoard(Difficulty.Easy);
     }
 
     public Gameboard(Difficulty difficulty)
     {
-        GenerateBoard((int) difficulty);
+        GenerateBoard(difficulty);
     }
 
     #endregion
@@ -94,19 +96,15 @@ public class Gameboard
      *      Generates the solution to the game.
      *      Computes the hints for the game.
      */
-    public void GenerateBoard(int difficulty)
+    private void GenerateBoard(Difficulty difficulty)
     {
-        //TODO: safely destroy old board if it exists
-        if (difficulty >= 0 && difficulty < System.Enum.GetValues(typeof(Difficulty)).Length)
-            InitializeBoards((Difficulty) difficulty);
-        else
-            InitializeBoards(Difficulty.Easy);
+        InitializeBoards(difficulty);
         GenerateSolution();
         GenerateHints(IndexType.Row);
         GenerateHints(IndexType.Column);
     }
     
-    public void ToggleTile(Tile tile)
+    public void Toggle(Tile tile)
     {
         tile.Toggle();
         // everytime a Tile is toggled, you want to check the win condition
@@ -123,6 +121,17 @@ public class Gameboard
     {
         if (gameboard != null)
         {
+            //new code
+            for (int row = 0; row < size; row++)
+            {
+                List<Tile> currRow = gameboardList[row];
+                for (int col = 0; col < size; col++)
+                {
+                    currRow[col]?.Reset();
+                }
+            }
+            //end new code
+            //old code
             for (int col = 0; col < size; col++)
             {
                 for (int row = 0; row < size; row++)
@@ -130,6 +139,7 @@ public class Gameboard
                     gameboard[row, col]?.Reset();
                 }
             }
+            //end old code
         }
         else
         {
@@ -151,6 +161,31 @@ public class Gameboard
             solution.Append("\n");
         }
         Debug.Log(solution.ToString());
+    }
+
+    //new board size
+    public void ChangeDifficulty(Difficulty difficulty)
+    {
+        // determine if new size is smaller or larger
+        int oldSize = size;
+        size = (int)difficulty + initialSize;
+        if (oldSize < size)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+
+    //same board size
+    public void Reroll()
+    {
+        // clear gameboard
+        // clear solutionboard
+        // destroy current hints
+        // need to generate new hints
     }
 
     #endregion
@@ -396,9 +431,26 @@ public class Gameboard
 
         return solved;
     }
-    
+
     #endregion
-    
+
+    #region destruction
+
+    public void Destroy()
+    {
+        // safely clear the lists in the Hints objects
+        for (int index = 0; index < size; index++)
+        {
+            rowHints[index].Clear();
+            columnHints[index].Clear();
+        }
+        rowHints = null;
+        columnHints = null;
+        gameboard = null;
+        solutionBoard = null;
+    }
+
+    #endregion
 
 }
 

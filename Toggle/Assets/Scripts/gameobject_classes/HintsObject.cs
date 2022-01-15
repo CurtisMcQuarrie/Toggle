@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// instantiates hints prefab with correct sprites
 public class HintsObject : MonoBehaviour
 {
     #region fields
@@ -16,6 +17,9 @@ public class HintsObject : MonoBehaviour
     #endregion
 
     #region methods
+    /*
+     * instantiates hints prefab
+     */ 
     public GameObject CreateHint(int[] hints, HintsPrefabs hintPrefab, Transform parentTransform)
     {
         GameObject hintPanel = Instantiate(hint_panel_prefabs[(int) hintPrefab], parentTransform);

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// instantiates tile and spacer prefabs
 public class GameboardObject : MonoBehaviour
 {
     #region fields
@@ -13,6 +14,7 @@ public class GameboardObject : MonoBehaviour
     #endregion
 
     #region public methods
+    // instantiates a row of tile prefabs
     public GameObject[] CreateBoardRow(Tile[] rowTiles, Transform parentTransform)
     {
         GameObject[] rowTileObjects = new GameObject[rowTiles.Length];
@@ -34,6 +36,7 @@ public class GameboardObject : MonoBehaviour
         return rowTileObjects;
     }
 
+    // instanties space prefab
     public void CreateSpacerPanel(Transform parentTransform)
     {
         if(spacerPrefab != null)

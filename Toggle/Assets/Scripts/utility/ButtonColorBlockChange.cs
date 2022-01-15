@@ -1,10 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/* ButtonColorBlockChange
+ * Purpose:
+ *      Changes the color block of the button gameobject that this script is attached too.
+ */ 
 [RequireComponent(typeof(Button))]
 public class ButtonColorBlockChange : MonoBehaviour, ITileObjectSubscriber
 {
     #region fields
+
     private Button button;
 
     [Header("Is Off Color Block")]
@@ -24,7 +29,17 @@ public class ButtonColorBlockChange : MonoBehaviour, ITileObjectSubscriber
 
     #endregion
 
-    #region ISubscriber implementation
+    #region interface
+
+    public void ChangeColor(bool isOn)
+    {
+        button.colors = isOn ? isOnColorBlock : isOffColorBlock;
+    }
+
+    #endregion
+
+    #region interface implementations
+
     void ITileObjectSubscriber.Update(TileObject tileObject)
     {
         ChangeColor(tileObject.Tile.IsOn);
@@ -35,13 +50,5 @@ public class ButtonColorBlockChange : MonoBehaviour, ITileObjectSubscriber
         throw new System.NotImplementedException();
     }
     
-
-    private void ChangeColor(bool isOn)
-    {
-        button.colors = isOn ? isOnColorBlock : isOffColorBlock;
-    }
-
-
-
     #endregion
 }
