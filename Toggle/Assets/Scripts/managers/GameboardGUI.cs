@@ -146,8 +146,11 @@ public class GameboardGUI : MonoBehaviour
                 GameObject instantiatedObject = CreatePrefab(hintPrefab, parentTransform);
 
                 // set sprite in hint
-                Sprite texture = hintSprites[hints[i] - 1];
-                instantiatedObject.GetComponent<Image>().sprite = texture;
+                if (hints[i] > 0)
+                {
+                    Sprite texture = hintSprites[hints[i]-1];
+                    instantiatedObject.GetComponent<Image>().sprite = texture;
+                }
 
                 // instantiate dividers
                 if (i != hints.Length - 1)

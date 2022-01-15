@@ -206,7 +206,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7992661}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1021643749}
+        m_TargetAssemblyTypeName: GameboardController, Assembly-CSharp
+        m_MethodName: Reroll
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &7992661
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,7 +286,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 528558561}
-  - {fileID: 1370440605}
   - {fileID: 614351703}
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -903,7 +914,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 204674677}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &614351704
 MonoBehaviour:
@@ -1652,6 +1663,8 @@ GameObject:
   - component: {fileID: 1021643744}
   - component: {fileID: 1021643746}
   - component: {fileID: 1021643747}
+  - component: {fileID: 1021643749}
+  - component: {fileID: 1021643748}
   m_Layer: 5
   m_Name: Gameboard_Panel
   m_TagString: Untagged
@@ -1762,6 +1775,47 @@ MonoBehaviour:
   spacing: {x: 5, y: 5}
   fitX: 1
   fitY: 1
+--- !u!114 &1021643748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021643741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcce45d94b95f7b4aa416de0e6bdf4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hintSprites:
+  - {fileID: 21300000, guid: e8e3f82fdb4417f44993533c9d0dd2b0, type: 3}
+  - {fileID: 21300000, guid: 46fdab9d55608e241a1647e1c92074fd, type: 3}
+  - {fileID: 21300000, guid: 442ddf54378d8ca47b6c6605e305eab1, type: 3}
+  - {fileID: 21300000, guid: 88f82add77258f74cb4450661c2a9ed1, type: 3}
+  - {fileID: 21300000, guid: 5ed5fac85d267db4092ac2faead2b91b, type: 3}
+  - {fileID: 21300000, guid: eb30d2edd5cf6ec4186d9531734532fe, type: 3}
+  dividerPrefabs:
+  - {fileID: 2648471756124522546, guid: ad566fbf77264ce458b44529afb5210e, type: 3}
+  - {fileID: 6060207427239058482, guid: 446be0d0e1025f7469348e863daa29e6, type: 3}
+  hintPanelPrefabs:
+  - {fileID: 1587195391434957204, guid: 9c7942e446868cc4a89e8a13cc592994, type: 3}
+  - {fileID: 838989284504974827, guid: 72fcffa7283b01c4ab81086c1028badb, type: 3}
+  hintPrefab: {fileID: 4420981073404440381, guid: 8be2ff83e143fc448bf0a303a1729039, type: 3}
+  spacerPrefab: {fileID: 294183893555960971, guid: 9ab58db89d4edf74f9af259e1ccc8e91, type: 3}
+  tilePrefab: {fileID: 2441272392217697771, guid: d241b1b82ae1d52418ce493e8ad441fb, type: 3}
+--- !u!114 &1021643749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021643741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfefe9ab900baef48bf8b0a445afeda5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameboardTransform: {fileID: 1021643742}
 --- !u!1 &1178772709
 GameObject:
   m_ObjectHideFlags: 0
@@ -2134,116 +2188,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6664567727410785977, guid: 9c7942e446868cc4a89e8a13cc592994, type: 3}
   m_PrefabInstance: {fileID: 1322694485}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1370440603
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1370440605}
-  - component: {fileID: 1370440607}
-  - component: {fileID: 1370440604}
-  - component: {fileID: 1370440606}
-  - component: {fileID: 1370440608}
-  m_Layer: 0
-  m_Name: GameBoardController
-  m_TagString: Gameboard
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1370440604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1370440603}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5729261d38251b418b0681627d2a982, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tilePrefab: {fileID: 2441272392217697771, guid: d241b1b82ae1d52418ce493e8ad441fb, type: 3}
-  spacerPrefab: {fileID: 294183893555960971, guid: 9ab58db89d4edf74f9af259e1ccc8e91, type: 3}
---- !u!4 &1370440605
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1370440603}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 204674677}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1370440606
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1370440603}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 698e2a7ef10661c48b59e2a1fb6a5608, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hint_sprites:
-  - {fileID: 21300000, guid: e8e3f82fdb4417f44993533c9d0dd2b0, type: 3}
-  - {fileID: 21300000, guid: 46fdab9d55608e241a1647e1c92074fd, type: 3}
-  - {fileID: 21300000, guid: 442ddf54378d8ca47b6c6605e305eab1, type: 3}
-  - {fileID: 21300000, guid: 88f82add77258f74cb4450661c2a9ed1, type: 3}
-  - {fileID: 21300000, guid: 5ed5fac85d267db4092ac2faead2b91b, type: 3}
-  - {fileID: 21300000, guid: eb30d2edd5cf6ec4186d9531734532fe, type: 3}
-  divider_prefabs:
-  - {fileID: 2648471756124522546, guid: ad566fbf77264ce458b44529afb5210e, type: 3}
-  - {fileID: 6060207427239058482, guid: 446be0d0e1025f7469348e863daa29e6, type: 3}
-  hint_panel_prefabs:
-  - {fileID: 1587195391434957204, guid: 9c7942e446868cc4a89e8a13cc592994, type: 3}
-  - {fileID: 838989284504974827, guid: 72fcffa7283b01c4ab81086c1028badb, type: 3}
-  hint_prefab: {fileID: 4420981073404440381, guid: 8be2ff83e143fc448bf0a303a1729039, type: 3}
---- !u!114 &1370440607
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1370440603}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfefe9ab900baef48bf8b0a445afeda5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameboardTransform: {fileID: 1021643742}
---- !u!114 &1370440608
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1370440603}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcce45d94b95f7b4aa416de0e6bdf4c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hintSprites: []
-  dividerPrefabs:
-  - {fileID: 0}
-  - {fileID: 0}
-  hintPanelPrefabs:
-  - {fileID: 0}
-  - {fileID: 0}
-  hintPrefab: {fileID: 0}
-  spacerPrefab: {fileID: 0}
-  tilePrefab: {fileID: 0}
 --- !u!1 &1455933441
 GameObject:
   m_ObjectHideFlags: 0
@@ -2967,7 +2911,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1370440604}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GameboardObject, Assembly-CSharp
         m_MethodName: SetDifficulty
         m_Mode: 3
@@ -3101,7 +3045,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1370440604}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GameboardObject, Assembly-CSharp
         m_MethodName: SetDifficulty
         m_Mode: 3
@@ -3412,7 +3356,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1370440604}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GameboardObject, Assembly-CSharp
         m_MethodName: SetDifficulty
         m_Mode: 3
@@ -3664,7 +3608,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1370440604}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GameboardObject, Assembly-CSharp
         m_MethodName: Reroll
         m_Mode: 1

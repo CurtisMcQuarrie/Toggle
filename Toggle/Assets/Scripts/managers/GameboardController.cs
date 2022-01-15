@@ -1,134 +1,127 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 /* GameboardController
  * Purpose:
  *      Uses GameboardGUI to instantiate gameboard prefabs and then connects them to the logic. 
  */
- [RequireComponent(typeof(GameboardGUI))]
+[RequireComponent(typeof(GameboardGUI))]
 public class GameboardController : MonoBehaviour
 {
     #region fields
 
     private List<GameObject> rowHints;
     private List<GameObject> columnHints;
-    private List<List<GameObject>> tileRow;
+    //private List<List<GameObject>> tileRow; //TODO: store tiles as GameObjects
 
     private Gameboard gameboard;
-    private HintsObject hintsObject; // TODO: remove
-    private GameboardObject gameboardObject; // TODO: remove
     public Transform gameboardTransform;
     private GameManager gameManager;
     private GameboardGUI gui;
-    
+
     #endregion
 
     #region monobehaviour
     void Awake()
     {
-        gameboard = new Gameboard();
+        gameboard = new Gameboard(); // initializes gameboard
+        rowHints = new List<GameObject>();
+        columnHints = new List<GameObject>();
     }
 
-    // grabs components to instantiate prefabs
     void Start()
     {
-        //  TODO: remove block
-        hintsObject = GetComponent<HintsObject>();
-        gameboardObject = GetComponent<GameboardObject>();
-        if (hintsObject == null)
-        {
-            Debug.Log("Missing HintsObject on Gameboard_Controller.");
-        }
-        else if (gameboardObject == null)
-        {
-            Debug.Log("Missing GameboardObject on Gameboard_Controller.");
-        }
-        
-        //gameManager = FindObjectOfType<GameManager>();
-        //gui = GetComponent<GameboardGUI>();
-        //SetDifficulty(gameManager.difficulty);
-        CreateBoard();
+        gameManager = FindObjectOfType<GameManager>();
+        gui = GetComponent<GameboardGUI>();
+        gameboard.ChangeDifficulty(gameManager.difficulty);
+        gameboard.PrintSolution();
+        Initialize();
     }
     #endregion
 
-    #region methods
+    #region interface
     // instantiates board gui and connects Tile instances to tile prefabs
-    public void CreateBoard()
+    public void Initialize()
     {
-        gameboardObject.CreateSpacerPanel(gameboardTransform);
+        gui.CreateSpacer(gameboardTransform); // instantiate spacer panel
 
-        // instantiate col hints
-        for (int col = 0; col < gameboard.Size(); col++)
+        for (int col = 0; col < gameboard.Size; col++) // instantiate col hints
         {
-            hintsObject.CreateHint(gameboard.GetColumnHints(col), HintsPrefabs.COL, gameboardTransform);
-
-            //Debug
-            //int[] hints = gameboard.GetColHints(col);
-            //Debug.Log("column " + col + " hint is:");
-            //string hintString = "";
-            //foreach (int hint in hints)
-            //{
-            //    hintString += hint + " ";
-            //}
-            //Debug.Log(hintString);
-
+            GameObject hint = gui.CreateHint(gameboard.GetColumnHints(col), IndexType.Column, gameboardTransform);
+            columnHints.Add(hint);
         }
 
         // instantiate row hints and tiles simultaneously
-        for (int row = 0; row < gameboard.Size(); row++)
+        for (int row = 0; row < gameboard.Size; row++)
         {
-            hintsObject.CreateHint(gameboard.GetRowHints(row), HintsPrefabs.ROW, gameboardTransform); // instantiate hint for row
-            GameObject[] rowTileObjects = gameboardObject.CreateBoardRow(gameboard.GetTiles(IndexType.Row, row), gameboardTransform); // instantiate tiles
-            ConnectRowTileObjects(rowTileObjects, row); // hookup TileObject to gameboard
+            rowHints.Add(gui.CreateHint(gameboard.GetRowHints(row), IndexType.Row, gameboardTransform));
+            for (int col = 0; col < gameboard.Size; col++)
+            {
+                GameObject tile = gui.CreateTile(gameboardTransform);
+                TileObject tileObject = tile.GetComponent<TileObject>();
+                tileObject.ConnectTile(gameboard, gameboard.GetTile(row, col)); // link gameobject to data structures
+                // connect subscribers attached to gameobject
+                ITileObjectSubscriber[] subscribers = tile.GetComponents<ITileObjectSubscriber>();
+                foreach (ITileObjectSubscriber subscriber in subscribers)
+                {
+                    tileObject.Subscribe(subscriber);
+                }
+            }
         }
-
-        gameboard.PrintSolution();
     }
 
     // sets the difficulty
-    public void SetDifficulty(Difficulty difficulty)
+    public void ChangeDifficulty(Difficulty difficulty)
     {
         Debug.Log("Set difficulty to " + difficulty);
-        gameboard = new Gameboard(difficulty);
+        if (gameManager.difficulty != difficulty)
+        {
+            gameManager.difficulty = difficulty;
+            gameboard.ChangeDifficulty(difficulty); // change gameboard difficulty
+            UpdateGUI();
+        }
     }
 
-    // creates a new gameboard
+
+    /* Reroll
+     * 
+     */
     public void Reroll()
     {
         Debug.Log("Rerolling Board...");
-        Difficulty currentDifficulty = gameboard.GetDifficulty();
-        // TODO: destroy current board safely
-        gameboard = new Gameboard(currentDifficulty);
+        gameboard.Reroll();
+        UpdateGUI();
         gameboard.PrintSolution();
     }
 
 
-    private void ConnectRowTileObjects(GameObject[] rowTileObjects, int rowNum)
+    public void Clear()
     {
-        for (int col = 0; col < rowTileObjects.Length; col++)
-        {
-            TileObject tileObject = rowTileObjects[col].GetComponent<TileObject>();
-            tileObject.ConnectTile(gameboard, gameboard.GetTile(rowNum, col));
-
-            ITileObjectSubscriber colorBlockChangeSubscriber = rowTileObjects[col].GetComponent<ButtonColorBlockChange>();
-            tileObject.Subscribe(colorBlockChangeSubscriber);
-        }
+        gameboard.Reset();
+        ClearGUI();
     }
     #endregion
 
-    private void AddToHintList(GameObject hintPanel, IndexType indexType)
+    #region gui
+
+    // assumes the datastructure has already been updated.
+    private void UpdateGUI()
     {
-        if (indexType == IndexType.Row)
-        {
-            rowHints.Add(hintPanel);
-        }
-        else if (indexType == IndexType.Column)
-        {
-            columnHints.Add(hintPanel);
-        }
+        //clear gui
+        // cycle through tiles
+        //tileObject.Toggle();
+        //update hints
+        // cycle through rowHints and columnHints
+        //gui.UpdateHint();
     }
+
+    private void ClearGUI()
+    {
+        
+    }
+
+    #endregion
 
     #region destruction
     private void OnDestroy()

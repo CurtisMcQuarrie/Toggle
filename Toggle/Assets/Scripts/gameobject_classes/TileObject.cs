@@ -58,7 +58,7 @@ public class TileObject : MonoBehaviour
             throw new System.Exception("Could not connect TileObject to gameboard and/or tile");
     }
 
-    public void PerformToggle()
+    public void Toggle()
     {
         if (gameboard != null && tile != null)
         {
@@ -117,7 +117,7 @@ public class TileObject : MonoBehaviour
         gameboard = null;
         tile = null;
         button = null;
-        subscribers.Clear();
+        //subscribers.Clear();
         subscribers = null;
     }
 

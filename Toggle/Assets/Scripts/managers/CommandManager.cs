@@ -6,19 +6,19 @@ using UnityEngine;
 public class CommandManager : MonoBehaviour
 {
     #region fields
-    private static CommandManager _instance;
-    private List<ICommand> _commandBuffer = new List<ICommand>();
+    private static CommandManager instance;
+    private List<ICommand> commandBuffer = new List<ICommand>();
     #endregion
 
     #region properties
     public static CommandManager Instance {
         get
         {
-            if (_instance == null)
+            if (instance == null)
             {
-                Debug.LogError("the CommandManager is NULL.");
+                Debug.LogError("The CommandManager is NULL.");
             }
-            return _instance;
+            return instance;
         }
     }
     #endregion
@@ -26,13 +26,13 @@ public class CommandManager : MonoBehaviour
     #region monobehaviour
     void Awake()
     {
-        _instance = this;
+        instance = this;
     }
     #endregion
 
     public void AddCommand(ICommand command)
     {
-        _commandBuffer.Add(command);
+        commandBuffer.Add(command);
     }
 
     public void Play()
@@ -43,7 +43,7 @@ public class CommandManager : MonoBehaviour
     private IEnumerator PlayRoutine()
     {
         Debug.Log("Playing...");
-        foreach (var command in _commandBuffer)
+        foreach (var command in commandBuffer)
         {
             command.Execute();
             yield return new WaitForSeconds(1f);
@@ -58,7 +58,7 @@ public class CommandManager : MonoBehaviour
 
     private IEnumerator RewindRoutine()
     {
-        foreach (var command in Enumerable.Reverse(_commandBuffer))
+        foreach (var command in Enumerable.Reverse(commandBuffer))
         {
             command.Undo();
             yield return new WaitForSeconds(1f);
@@ -72,6 +72,6 @@ public class CommandManager : MonoBehaviour
 
     public void Reset()
     {
-        _commandBuffer.Clear();
+        commandBuffer.Clear();
     }
 }

@@ -43,7 +43,7 @@ public class ToggleCommand : ICommand
 
     private void PerformToggle()
     {
-        tile?.PerformToggle();
+        tile?.Toggle();
     }
 
     #endregion
