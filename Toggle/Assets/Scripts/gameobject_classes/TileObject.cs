@@ -27,11 +27,11 @@ public class TileObject : MonoBehaviour
     #endregion
 
     #region monobehaviour
+
     void Awake()
     {
         subscribers = new List<ITileObjectSubscriber>();
     }
-
 
     void Start()
     {
@@ -63,6 +63,26 @@ public class TileObject : MonoBehaviour
         if (gameboard != null && tile != null)
         {
             gameboard?.Toggle(tile);
+            NotifySubscribers();
+        }
+        else
+            throw new System.Exception("Could not connect TileObject to gameboard and/or tile");
+    }
+
+    public void Reset()
+    {
+        Toggle(false);
+    }
+
+    #endregion
+
+    #region 
+
+    private void Toggle(bool state)
+    {
+        if (gameboard != null && tile != null)
+        {
+            gameboard?.Toggle(tile, state);
             NotifySubscribers();
         }
         else
@@ -117,7 +137,6 @@ public class TileObject : MonoBehaviour
         gameboard = null;
         tile = null;
         button = null;
-        //subscribers.Clear();
         subscribers = null;
     }
 

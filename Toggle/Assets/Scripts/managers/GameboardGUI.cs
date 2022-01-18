@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,8 +6,8 @@ using UnityEngine.UI;
  *      Instantiates gameboard prefabs for GUI.
  *      Creates only a single object at a time.
  *      Special case for creating a hint because a hint requires children.
- */ 
- // TODO: add customization with scriptable object reference.
+ */
+// TODO: add customization with scriptable object reference.
 public class GameboardGUI : MonoBehaviour
 {
     #region fields
@@ -41,6 +40,13 @@ public class GameboardGUI : MonoBehaviour
         return CreatePrefab(tilePrefab, parentTransform);
     }
 
+    public GameObject CreateTile(Transform parentTransform, int siblingIndex)
+    {
+        GameObject tile = CreatePrefab(tilePrefab, parentTransform);
+        tile.transform.SetSiblingIndex(siblingIndex);
+        return tile;
+    }
+
     public void ClearTile(GameObject tile)
     {
         ButtonColorBlockChange colorBlock = tile.GetComponent<ButtonColorBlockChange>();
@@ -65,9 +71,17 @@ public class GameboardGUI : MonoBehaviour
         return hintPanel;
     }
 
+    public GameObject CreateHint(int[] hints, IndexType indexType, Transform parentTransform, int siblingIndex)
+    {
+        GameObject hintPanel = CreatePrefab(hintPanelPrefabs[(int)indexType], parentTransform);
+        hintPanel.transform.SetSiblingIndex(siblingIndex);
+        FillHintsPrefab(hints, indexType, hintPanel.GetComponent<Transform>());
+        return hintPanel;
+    }
+
     public void UpdateHint(int[] newHints, IndexType indexType, GameObject hintObject)
     {
-        DestroyChildObjects(transform);
+        DestroyChildObjects(hintObject.transform);
         FillHintsPrefab(newHints, indexType, hintObject.GetComponent<Transform>());
     }
 
@@ -75,14 +89,14 @@ public class GameboardGUI : MonoBehaviour
 
     #region spacer
 
-    public void CreateSpacer()
+    public GameObject CreateSpacer()
     {
-        CreatePrefab(spacerPrefab);
+        return CreatePrefab(spacerPrefab);
     }
 
-    public void CreateSpacer(Transform parentTransform)
+    public GameObject CreateSpacer(Transform parentTransform)
     {
-        CreatePrefab(spacerPrefab, parentTransform);
+        return CreatePrefab(spacerPrefab, parentTransform);
     }
 
     #endregion
@@ -173,7 +187,7 @@ public class GameboardGUI : MonoBehaviour
     {
         foreach (Transform child in parentTransform)
         {
-            Destroy(child);
+            Destroy(child.gameObject);
         }
     }
 

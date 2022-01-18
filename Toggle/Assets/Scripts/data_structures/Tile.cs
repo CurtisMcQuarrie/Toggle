@@ -39,6 +39,12 @@ public class Tile
         return isOn;
     }
 
+    public bool Toggle(bool isOn)
+    {
+        this.isOn = isOn;
+        return this.isOn;
+    }
+
     public bool Reset()
     {
         if (isOn)

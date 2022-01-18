@@ -23,6 +23,7 @@ public class Gameboard
     private List<Hint> rowHints;
     private List<Hint> columnHints;
     private int size;
+    private bool gameWon;
 
     #endregion
 
@@ -92,13 +93,23 @@ public class Gameboard
         if (CheckSolution())
             Debug.Log("You Win!");
     }
-    
+
+    public void Toggle(Tile tile, bool isOn)
+    {
+        tile?.Toggle(isOn);
+        // everytime a Tile is toggled, you want to check the win condition
+        // TODO: move solution checking to GameboardController
+        if (CheckSolution())
+            Debug.Log("You Win!");
+    }
+
     /* Reset (new and complete)
      * Purpose:
      *      Sets all Tiles within the gameboard and solution board to false.
-     */ 
+     */
     public void Reset()
     {
+        gameWon = false;
         for (int index = 0; index < size; index++)
         {
             gameboardList[index].Reset();
@@ -120,11 +131,21 @@ public class Gameboard
         }
     }
 
+    /* CheckSolution (complete)
+     * Purpose:
+     *      Checks if the gameboard state matches the solution.
+     */
+    public bool CheckSolution()
+    {
+        gameWon = (CheckSolution(IndexType.Row) && CheckSolution(IndexType.Column));
+        return gameWon;
+    }
+
     /* PrintSolution (new and completed)
      * Purpose:
      *      For debug purposes only.
      *      Allows the developer to see the current solution in the debug window.
-     */ 
+     */
     public void PrintSolution()
     {
         StringBuilder solution = new StringBuilder();
@@ -147,8 +168,6 @@ public class Gameboard
         GenerateSolution();// generate new solution
         GenerateHints();// generate new hints
     }
-
-    
 
     /* Reroll
      * Purpose:
@@ -175,8 +194,9 @@ public class Gameboard
         for (int row = 0; row < size; row++)
         {
             bool filled = false;
-            int startingCol = 0;
-            int maxEnabled = size + 1;
+            // have random starting column for first entry
+            int startingCol = Random.Range(0, size-1); //changed from 0
+            int maxEnabled = size + 1 - startingCol;
             while (!filled)
             {
                 // logic for randomly generating row tile count enabled
@@ -190,7 +210,7 @@ public class Gameboard
                 // TODO: add a random startingCol to place
                 // TODO: balance the challenge (getting too many zeros or too many large numbers)
                 solutionBoardList[row].ToggleConsecutive(startingCol, amountEnabled);
-                startingCol += amountEnabled + 1;
+                startingCol += amountEnabled + Random.Range(1,2);//1; TODO: change "2" into valid num
             }
         }
     }
@@ -251,15 +271,6 @@ public class Gameboard
 
     #region solution checking
     
-    /* CheckSolution (complete)
-     * Purpose:
-     *      Checks if the gameboard state matches the solution.
-     */
-    private bool CheckSolution()
-    {
-        return CheckSolution(IndexType.Row) && CheckSolution(IndexType.Column);
-    }
-
     /* CheckSolution (modified and complete)
      * Purpose:
      *      Checks whether or not all columns or rows match the hints.
@@ -319,6 +330,7 @@ public class Gameboard
      */
     private void Initialize()
     {
+        gameWon = false;
         rowHints = new List<Hint>();
         columnHints = new List<Hint>();
         gameboardList = new List<BoardRow>();
@@ -334,7 +346,7 @@ public class Gameboard
      */
     private void Setup()
     {
-        for (int row = 0; row < size; row++)
+        for (int index = 0; index < size; index++)
         {
             gameboardList.Add(new BoardRow(size));
             solutionBoardList.Add(new BoardRow(size));
@@ -354,37 +366,40 @@ public class Gameboard
     private void SetDifficulty(Difficulty difficulty)
     {
         int oldSize = size;
-        int amountToChange = size - oldSize;
         size = (int)difficulty + initialSize;
-        if (oldSize < size) // board size needs to be increased
+        if (oldSize > 0) // only perform if board has already been initialized
         {
-            for (int row = 0; row < oldSize; row++) // increase column size
+            int amountToChange = size - oldSize;
+            if (oldSize < size) // board size needs to be increased
             {
-                gameboardList[row].Add(amountToChange);
-                solutionBoardList[row].Add(amountToChange);
+                for (int row = 0; row < oldSize; row++) // increase column size
+                {
+                    gameboardList[row].Add(amountToChange);
+                    solutionBoardList[row].Add(amountToChange);
+                }
+                for (int i = 0; i < amountToChange; i++) // increase row size
+                {
+                    gameboardList.Add(new BoardRow(size)); // add rows to gameboard
+                    solutionBoardList.Add(new BoardRow(size)); // add rows to solutionBoard
+                    rowHints.Add(new Hint()); // add columns to rowHints
+                    columnHints.Add(new Hint()); // add rows to columnHints
+                }
             }
-            for (int i = 0; i < amountToChange; i++) // increase row size
+            else if (oldSize > 0 && size < oldSize) // board size needs to be decreased
             {
-                gameboardList.Add(new BoardRow(size)); // add rows to gameboard
-                solutionBoardList.Add(new BoardRow(size)); // add rows to solutionBoard
-                rowHints.Add(new Hint()); // add columns to rowHints
-                columnHints.Add(new Hint()); // add rows to columnHints
-            }
-        }
-        else if (oldSize > 0 && size < oldSize) // board size needs to be decreased
-        {
-            amountToChange = -amountToChange;
-            for (int i = 0; i < amountToChange; i++) // decrease row size
-            {
-                gameboardList.RemoveAt(gameboardList.Count - 1);
-                solutionBoardList.RemoveAt(solutionBoardList.Count - 1);
-                rowHints.RemoveAt(rowHints.Count - 1);
-                columnHints.RemoveAt(rowHints.Count - 1);
-            }
-            for (int row = 0; row < size; row++) // decrease column size
-            {
-                gameboardList[row].RemoveLast(amountToChange);
-                solutionBoardList[row].RemoveLast(amountToChange);
+                amountToChange = -amountToChange;
+                for (int i = 0; i < amountToChange; i++) // decrease row size
+                {
+                    gameboardList.RemoveAt(gameboardList.Count - 1);
+                    solutionBoardList.RemoveAt(solutionBoardList.Count - 1);
+                    rowHints.RemoveAt(rowHints.Count - 1);
+                    columnHints.RemoveAt(rowHints.Count - 1);
+                }
+                for (int row = 0; row < size; row++) // decrease column size
+                {
+                    gameboardList[row].RemoveLast(amountToChange);
+                    solutionBoardList[row].RemoveLast(amountToChange);
+                }
             }
         }
         // boards being initialized does not need to have it's boardsize adjusted
