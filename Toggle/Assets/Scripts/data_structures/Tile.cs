@@ -20,10 +20,19 @@ public class Tile
     #endregion
     
     #region properties
-    public bool Enabled { get => enabled; set => enabled = value; }
+    public bool Enabled { get => enabled; set => enabled = value;}
     #endregion
 
     #region methods
+    public bool Toggle()
+    {
+        enabled = !enabled;
+        return enabled;
+    }
 
+    public override string ToString()
+    {
+        return enabled.ToString();
+    }
     #endregion
 }
