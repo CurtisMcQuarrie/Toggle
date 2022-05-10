@@ -1,7 +1,7 @@
 /* Tile
  * Purpose:
  *      Control its own state within the gameboard.
- *      Basic game piece that the user manipulates that state of.
+ *      Basic game piece that the user manipulates.
  */ 
 public class Tile
 {

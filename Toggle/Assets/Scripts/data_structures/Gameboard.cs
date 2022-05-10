@@ -54,6 +54,7 @@ public class Gameboard
     public int[] GetRowHints(int row) { return rowHints[row].HintValues; }
     
     public Tile GetTile(int row, int column) { return gameboardList[row].GetTile(column); }
+
     /* GetTiles (modified and completed)
      * Purpose:
      *      Retrieves the Tile instances stored in the specified row or column number.
@@ -408,7 +409,7 @@ public class Gameboard
 
     #region destruction
 
-    /* Destroy (complete)
+    /* Destroy (completed)
      * Purpose:
      *      To safely clear the fields and their components.
      */

@@ -5,6 +5,7 @@ public class BoardRow
 {
 
     #region fields
+
     private int size;
     private List<Tile> tiles;
 
