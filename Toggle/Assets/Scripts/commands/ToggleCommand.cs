@@ -1,25 +1,35 @@
-using UnityEngine;
-
+/* ToggleCommand
+ * Purpose:
+ *      Manipulates TileObjects by calling their PerformToggle method.
+ *      Used in Command Pattern within CommandManager class.
+ */
 public class ToggleCommand : ICommand
 {
-    private Gameboard gameboard;
-    private Tile tile;
+    #region fields
 
-    public ToggleCommand(Gameboard gameboard, Tile tile)
+    private TileObject tile;
+
+    #endregion
+
+    #region constructors
+
+    public ToggleCommand(TileObject tileObject)
     {
-        this.gameboard = gameboard;
-        this.tile = tile;
+        tile = tileObject;
     }
+
+    #endregion
+
+    #region interface
 
     public void Execute()
     {
         PerformToggle();
-        //Debug.Log("Enabled state set to " + tile.Enabled);
     }
 
     public void Redo()
     {
-        throw new System.NotImplementedException();
+        PerformToggle();
     }
 
     public void Undo()
@@ -27,11 +37,14 @@ public class ToggleCommand : ICommand
         PerformToggle();
     }
 
+    #endregion
+
+    #region utility
+
     private void PerformToggle()
     {
-        if (gameboard != null)
-        {
-            gameboard.ToggleTile(tile);
-        }
+        tile?.Toggle();
     }
+
+    #endregion
 }

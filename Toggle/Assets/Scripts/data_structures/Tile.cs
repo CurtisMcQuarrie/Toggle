@@ -1,38 +1,65 @@
+/* Tile
+ * Purpose:
+ *      Control its own state within the gameboard.
+ *      Basic game piece that the user manipulates.
+ */ 
 public class Tile
 {
     #region fields
-    private bool enabled;
-    //private bool locked;
-    //private int damage;
+
+    private bool isOn;
+
     #endregion
 
     #region constructors
+
     public Tile()
     {
-        enabled = false;
+        isOn = false;
     }
 
-    public Tile(bool isEnabled)
+    public Tile(bool isOn)
     {
-        Enabled = isEnabled;
+        this.isOn = isOn;
     }
 
     #endregion
     
     #region properties
-    public bool Enabled { get => enabled; set => enabled = value;}
+
+    public bool IsOn { get => isOn;}
+    
     #endregion
 
-    #region methods
+    #region isOn manipulation
+
     public bool Toggle()
     {
-        enabled = !enabled;
-        return enabled;
+        isOn = !isOn;
+        return isOn;
     }
+
+    public bool Toggle(bool isOn)
+    {
+        this.isOn = isOn;
+        return this.isOn;
+    }
+
+    public bool Reset()
+    {
+        if (isOn)
+            isOn = false;
+        return isOn;
+    }
+
+    #endregion
+
+    #region utility
 
     public override string ToString()
     {
-        return enabled.ToString();
+        return isOn.ToString();
     }
+
     #endregion
 }
