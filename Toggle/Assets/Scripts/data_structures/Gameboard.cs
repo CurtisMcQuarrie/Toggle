@@ -1,29 +1,30 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 /* Gameboard
  * Purpose:
  *      Holds basic details about the current game.
  *      Handles Tile instantiation, manipulation and destruction for both the solution board and the gameboard.
- *      Computes hints that are used to solve the game.
- */ 
+ *      Computes Hints that are used to solve the game.
+ */
 public class Gameboard
 {
     #region constants
 
-    private const int initialSize = 3;
+    private const int initialSize = 3; // the starting size if no difficult is specified
 
     #endregion
 
     #region fields
     
-    private List<BoardRow> gameboardList;
-    private List<BoardRow> solutionBoardList;
-    private List<Hint> rowHints;
-    private List<Hint> columnHints;
-    private int size;
-    private bool gameWon;
+    private List<List<Tile>> tileList; // the gameboard
+    private List<List<Tile>> solutionList; // a single solution to the game
+    private List<List<Hint>> hintList; // the hints to the solution
+    private int size; // the width and height of the gameboard
+    private int minAmountTilesOn;
+    private int maxAmountTilesOn;
 
     #endregion
 
@@ -32,15 +33,13 @@ public class Gameboard
     public Gameboard()
     {
         Initialize(); // initialize fields
-        SetDifficulty(Difficulty.Easy); // set difficulty
-        Setup(); // setup boards (game and solution)
+        SetDifficulty(Difficulty.Easy); // populate fields
     }
 
     public Gameboard(Difficulty difficulty)
     {
         Initialize(); // initialize fields
-        SetDifficulty(difficulty); // set difficulty
-        Setup(); // setup boards (game and solution)
+        SetDifficulty(difficulty);  // populate fields
     }
 
     #endregion
@@ -50,33 +49,36 @@ public class Gameboard
     public Difficulty GetDifficulty() { return (Difficulty)(size - initialSize); }
     public int Size { get => size; }
 
-    public int[] GetColumnHints(int column) { return columnHints[column].HintValues; }
-    public int[] GetRowHints(int row) { return rowHints[row].HintValues; }
+    public int[] GetColumnHints(int column) { return hintList[(int)IndexType.Column][column].HintValues; }
+    public int[] GetRowHints(int row) { return hintList[(int)IndexType.Row][row].HintValues; }
     
-    public Tile GetTile(int row, int column) { return gameboardList[row].GetTile(column); }
+    public Tile GetTile(int row, int column) { return tileList[row][column]; }
 
-    /* GetTiles (modified and completed)
+    /* GetTiles (O(n) time complexity, n = size)
      * Purpose:
      *      Retrieves the Tile instances stored in the specified row or column number.
      * Params:
      *      IndexType indexType     Specifies whether to retrieve row or column.
      *      int index               Specifies row or column number to fetch the Tile instances from.
      * Returns: 
-     *      Tile[] rowTiles         All the the Tile instances stored in the specified column number. 
+     *      Tile[] tiles            All the Tile instances stored in the specified row or column number. 
      */
     public Tile[] GetTiles(IndexType indexType, int index)
     {
         Tile[] tiles = new Tile[size];
 
+        // case A: return a row of tiles
         if (indexType == IndexType.Row)
         {
-            tiles = gameboardList[index].Tiles;
+            tiles = tileList[index].ToArray();
         }
+        // case B: return a column of tiles
         else if (indexType == IndexType.Column)
         {
+            // loop through each row to get column value
             for (int row = 0; row < size; row++)
             {
-                tiles[row] = gameboardList[row].GetTile(index);
+                tiles[row] = tileList[row][index];
             }
         }
         
@@ -84,88 +86,129 @@ public class Gameboard
     }
     #endregion
     
-    #region interface
+    #region public methods
     
+    /* Toggle
+     * Purpose:
+     *      Changes the state of the Tile to the opposite of its current state.
+     * Params:
+     *      Tile tile           The Tile instance to call Toggle method.
+     */
     public void Toggle(Tile tile)
     {
         tile?.Toggle();
-        // everytime a Tile is toggled, you want to check the win condition
-        // TODO: move solution checking to GameboardController
-        if (CheckSolution())
-            Debug.Log("You Win!");
     }
 
+    /* Toggle
+     * Purpose:
+     *      Changes the state of the Tile to the specified value.
+     * Params:
+     *      Tile tile           The Tile instance to call Toggle method.
+     *      bool isOn           The state to set the Tile instance too.
+     */
     public void Toggle(Tile tile, bool isOn)
     {
         tile?.Toggle(isOn);
-        // everytime a Tile is toggled, you want to check the win condition
-        // TODO: move solution checking to GameboardController
-        if (CheckSolution())
-            Debug.Log("You Win!");
     }
 
-    /* Reset (new and complete)
+    /* Toggle
      * Purpose:
-     *      Sets all Tiles within the gameboard and solution board to false.
+     *      Changes the state of the Tile to the opposite of its current state.
+     * Params:
+     *      int row                 The row to locate the Tile instance.
+     *      int column              The column to locate the Tile instance.
+     */
+    public void Toggle(int row, int column)
+    {
+        tileList[row][column]?.Toggle();
+    }
+
+    /* Toggle
+     * Purpose:
+     *      Changes the state of the Tile to the specified value.
+     * Params:
+     *      int row                 The row to locate the Tile instance.
+     *      int column              The column to locate the Tile instance.
+     *      bool isOn               The state to set the Tile instance too.
+     */
+    public void Toggle(int row, int column, bool isOn)
+    {
+        tileList[row][column]?.Toggle(isOn);
+    }
+
+    /* Reset (O(n^2) time complexity, n = size)
+     * Purpose:
+     *      Sets all Tiles within the tileList to false AND empties all hints.
      */
     public void Reset()
     {
-        gameWon = false;
-        for (int index = 0; index < size; index++)
+        // resets the Tile and Hint collection
+        for (int row = 0; row < size; row++)
         {
-            gameboardList[index].Reset();
-            solutionBoardList[index].Reset();
-            rowHints[index].Destroy();
-            columnHints[index].Destroy();
+            for (int col = 0; col < size; col++)
+            {
+                tileList[row][col].Reset();
+                solutionList[row][col].Reset();
+                // case A: row index is valid for Hint collection
+                if (row < (int) IndexType.Size)
+                {
+                    hintList[row][col].Clear();
+                }
+            }
         }
     }
 
-    /* Clear (new and complete)
+    /* Clear (O(n^2) time complexity, n = size)
      * Purpose:
      *      Sets all Tiles within only the gameboard to false.
      */ 
     public void Clear()
     {
+        // cycle through each Tile inside the tileList
         for (int row = 0; row < size; row++)
         {
-            gameboardList[row].Reset();
+            for (int col = 0; col < size; col++)
+            {
+                tileList[row][col].Reset();
+            }
         }
     }
 
-    /* CheckSolution (complete)
+    /* CheckSolution
      * Purpose:
      *      Checks if the gameboard state matches the solution.
      */
     public bool CheckSolution()
     {
-        gameWon = (CheckSolution(IndexType.Row) && CheckSolution(IndexType.Column));
-        return gameWon;
+        return (CheckSolution(IndexType.Row) && CheckSolution(IndexType.Column));
     }
 
-    /* PrintSolution (new and completed)
+    /* PrintSolution
      * Purpose:
      *      For debug purposes only.
-     *      Allows the developer to see the current solution in the debug window.
+     *      Allows the developer to see a solution in the debug window.
      */
     public void PrintSolution()
     {
         StringBuilder solution = new StringBuilder();
         for (int row = 0; row < size; row++)
         {
-            solution.Append(solutionBoardList[row].ToString());
+            for (int col = 0; col < size; col++)
+            {
+                solution.Append(solutionList[row][col].ToString());
+            }
             solution.Append("\n");
         }
         Debug.Log(solution.ToString());
     }
 
-    /* ChangeDifficulty (new)
+    /* ChangeDifficulty
      * Purpose:
-     *      Changes the gameboard size and generates a new solution without creating new objects unless necessary.
+     *      Changes the gameboard size and generates a new solution.
      */ 
     public void ChangeDifficulty(Difficulty difficulty)
     {
-        SetDifficulty(difficulty); // adjust board size
-        Reset(); // reset all boards and hints
+        SetDifficulty(difficulty); // change the board size
         GenerateSolution();// generate new solution
         GenerateHints();// generate new hints
     }
@@ -187,32 +230,29 @@ public class Gameboard
 
     /* GenerateSolution (new and complete)
      * Purpose:
-     *      Randomly generates the number of rows enabled in the solutionBoard.
-     *      Randomizes by rows.
+     *      Randomly generates the number tiles in the On state for the solution.
+     *      Randomly generates the tuple that indicates which Tiles are on.
      */
     private void GenerateSolution()
     {
-        for (int row = 0; row < size; row++)
+        HashSet<Tuple<int, int>> solution = new HashSet<Tuple<int, int>>();
+        // calculate the range of tiles that can be on at this difficulty
+        minAmountTilesOn = (int) size*size/2;
+        maxAmountTilesOn = (int) (minAmountTilesOn * 1.5);
+        // generate the number of tiles on in this solution
+        System.Random randomIntGen = new System.Random();
+        int amountTilesOn = randomIntGen.Next(minAmountTilesOn, maxAmountTilesOn + 1);
+        Debug.Log("Amount = " + amountTilesOn + "\tMin = " + minAmountTilesOn + "\t\tMax = " + maxAmountTilesOn);
+        // generate random tuples that represent tile indices inside tileList
+        for (int index = 0; index < amountTilesOn; index++)
         {
-            bool filled = false;
-            // have random starting column for first entry
-            int startingCol = Random.Range(0, size-1); //changed from 0
-            int maxEnabled = size + 1 - startingCol;
-            while (!filled)
-            {
-                // logic for randomly generating row tile count enabled
-                int amountEnabled = Random.Range(0, maxEnabled);
-                maxEnabled -= (amountEnabled + 1);
-                if (maxEnabled < 1 || amountEnabled <= 0)
-                {
-                    filled = true;
-                }
-
-                // TODO: add a random startingCol to place
-                // TODO: balance the challenge (getting too many zeros or too many large numbers)
-                solutionBoardList[row].ToggleConsecutive(startingCol, amountEnabled);
-                startingCol += amountEnabled + Random.Range(1,2);//1; TODO: change "2" into valid num
-            }
+            // keep generating a random tuple if the generated tuple already exists in the HashSet
+            while (!solution.Add(new Tuple<int, int> (randomIntGen.Next(0, size), randomIntGen.Next(0, size)))){}
+        }
+        // turn on values for solutionList
+        foreach (Tuple<int, int> tuple in solution)
+        {
+            solutionList[tuple.Item1][tuple.Item2].Toggle(true);
         }
     }
 
@@ -223,99 +263,56 @@ public class Gameboard
     /* GenerateHints
      * Purpose:
      *      Computes hints for both rows and columns.
-     */ 
+     */
     private void GenerateHints()
     {
         GenerateHints(IndexType.Row);
         GenerateHints(IndexType.Column);
     }
 
-    /* GenerateHints (modified and needs cleanup)
+    /* GenerateHints
      * Purpose:
      *      To compute the hints for the specified List in the game.
      * Params:
      *      IndexType indexType     Specifies whether row hints or column hints are being computed.
      */
-    // TODO: split into 2 methods for clarity (are no longer duplicate code)
     private void GenerateHints(IndexType indexType)
     {
-        if (indexType == IndexType.Row) // generate row hints
+        // go through the solutionList and count the number of Tiles that are consecutively On
+        for (int index = 0; index < size; index++)
         {
-            for (int row = 0; row < size; row++)
-            {
-                List<int> consec = solutionBoardList[row].GetConsecutiveOn();
-                rowHints[row] = new Hint(consec);
-            }
-        }
-        else if (indexType == IndexType.Column) // generate column hints
-        {
-            for (int col = 0; col < size; col++)
-            {
-                List<int> isOnList = new List<int>();
-                int consecutiveIsOn = 0;
-                for (int row = 0; row < size; row++)
-                {
-                    if (solutionBoardList[row].IsOn(col))
-                        consecutiveIsOn++;
-                    if (consecutiveIsOn > 0 && (row == size - 1 || !solutionBoardList[row].IsOn(col)))
-                    {
-                        isOnList.Add(consecutiveIsOn);
-                        consecutiveIsOn = 0;
-                    }
-                }
-                columnHints[col] = new Hint(isOnList);
-            }
+            // heavy lifting is done inside Hint class
+            hintList[(int)indexType][index] = new Hint(Hint.ComputeHint(solutionList, index, indexType));
         }
     }
 
     #endregion
 
     #region solution checking
-    
-    /* CheckSolution (modified and complete)
+
+    /* CheckSolution
      * Purpose:
      *      Checks whether or not all columns or rows match the hints.
      * Params:
      *      IndexType indexType     Determines whether the row or column hints are being checked.
      * Returns:
      *      bool solved             True if all Tile isOn fields match the hints.
-     */ 
-     // TODO: split into 2 methods for clarity (are no longer duplicate code)
+     */
     private bool CheckSolution(IndexType indexType)
     {
         bool solved = true;
-        if (indexType == IndexType.Row)
+
+        // loop through index of row or column
+        for (int index = 0; solved && index < size; index++)
         {
-            for (int row = 0; solved && row < size; row++)
+            // case A: the current row or column is not correctly solved
+            if (!hintList[(int)indexType][index].IsSolved(tileList, index, indexType))
             {
-                if (!rowHints[row].IsEqual(gameboardList[row].GetConsecutiveOn()))
-                {
-                    solved = false;
-                }
+                solved = false;
             }
+            // case B: the current row or column is correctly solved
         }
-        else if (indexType == IndexType.Column)
-        {
-            for(int col = 0; solved && col < size; col++) // go through each column and compare built boardState
-            {
-                List<int> columnState = new List<int>();
-                int consecutiveIsOn = 0;
-                for (int row = 0; row < size; row++)
-                {
-                    if (gameboardList[row].IsOn(col))
-                    {
-                        consecutiveIsOn++;
-                    }
-                    if (consecutiveIsOn > 0 && (row == size - 1 || !solutionBoardList[row].IsOn(col)))
-                    {
-                        columnState.Add(consecutiveIsOn);
-                        consecutiveIsOn = 0;
-                    }
-                }
-                if (!columnHints[col].IsEqual(columnState))
-                    solved = false;
-            }
-        }
+        
         return solved;
     }
 
@@ -323,115 +320,93 @@ public class Gameboard
 
     #region initialization
 
-    /* Initialize (new and completed)
+    /* Initialize
      * Purpose:
      *      Initializes all fields within this instance.
-     *      All fields will be initialized after calling this.
-     *      Only needs to be called by constructor.
      */
     private void Initialize()
     {
-        gameWon = false;
-        rowHints = new List<Hint>();
-        columnHints = new List<Hint>();
-        gameboardList = new List<BoardRow>();
-        solutionBoardList = new List<BoardRow>();
+        tileList = new List<List<Tile>>();
+        solutionList = new List<List<Tile>>();
+        hintList = new List<List<Hint>>();
         size = 0;
+        minAmountTilesOn = 0;
+        maxAmountTilesOn = 0;
     }
 
-    /* Setup (new and completed)
+    /* HardReset
      * Purpose:
-     *      Populates each collection with appropriate object type.
-     *      All collections will be filled after calling this.
-     *      Only needs to be called by constructor.
+     *      Resets the collections for the tiles and hints references to empty collections.
+     *      Also resets the gameboard size to 0.
      */
-    private void Setup()
+     private void HardReset()
     {
-        for (int index = 0; index < size; index++)
-        {
-            gameboardList.Add(new BoardRow(size));
-            solutionBoardList.Add(new BoardRow(size));
-            rowHints.Add(new Hint());
-            columnHints.Add(new Hint());
-        }
+        Destroy();
+        Initialize();
     }
 
-    /* SetDifficulty (new and completed)
+    /* SetDifficulty (O(n^2) time complexity, n = size)
      * Purpose:
      *      Sets the board size.
-     *      Adjusts the current boardsize if needed.
-     *      Does NOT clear old contents.
      * Params:
-     *      Difficulty difficulty           The difficulty to set the board sizes too.
+     *      Difficulty difficulty           Determines the new board size.
      */
     private void SetDifficulty(Difficulty difficulty)
     {
-        int oldSize = size;
-        size = (int)difficulty + initialSize;
-        if (oldSize > 0) // only perform if board has already been initialized
+        // case A: a board already exists
+        if (size > 0)
         {
-            int amountToChange = size - oldSize;
-            if (oldSize < size) // board size needs to be increased
+            HardReset();
+        }
+        // case B: this is the first time a board is being created
+
+        size = (int)difficulty + initialSize;
+
+        // initialize new Tile objects inside 2D collection tileList and solutionList
+        for (int row = 0; row < size; row++)
+        {
+            tileList.Add(new List<Tile>());
+            solutionList.Add(new List<Tile>());
+            for (int col = 0; col < size; col++)
             {
-                for (int row = 0; row < oldSize; row++) // increase column size
-                {
-                    gameboardList[row].Add(amountToChange);
-                    solutionBoardList[row].Add(amountToChange);
-                }
-                for (int i = 0; i < amountToChange; i++) // increase row size
-                {
-                    gameboardList.Add(new BoardRow(size)); // add rows to gameboard
-                    solutionBoardList.Add(new BoardRow(size)); // add rows to solutionBoard
-                    rowHints.Add(new Hint()); // add columns to rowHints
-                    columnHints.Add(new Hint()); // add rows to columnHints
-                }
-            }
-            else if (oldSize > 0 && size < oldSize) // board size needs to be decreased
-            {
-                amountToChange = -amountToChange;
-                for (int i = 0; i < amountToChange; i++) // decrease row size
-                {
-                    gameboardList.RemoveAt(gameboardList.Count - 1);
-                    solutionBoardList.RemoveAt(solutionBoardList.Count - 1);
-                    rowHints.RemoveAt(rowHints.Count - 1);
-                    columnHints.RemoveAt(rowHints.Count - 1);
-                }
-                for (int row = 0; row < size; row++) // decrease column size
-                {
-                    gameboardList[row].RemoveLast(amountToChange);
-                    solutionBoardList[row].RemoveLast(amountToChange);
-                }
+                tileList[row].Add(new Tile());
+                solutionList[row].Add(new Tile());
             }
         }
-        // boards being initialized does not need to have it's boardsize adjusted
+
+        // add the two lists to store row and column hints
+        hintList.Add(new List<Hint>());
+        hintList.Add(new List<Hint>());
+
+        // initilaize new Hint objects inside 2D collection hintList
+        for (int hint = 0; hint < size; hint++)
+        {
+            hintList[0].Add(new Hint());
+            hintList[1].Add(new Hint());
+        }
     }
     #endregion
 
     #region destruction
 
-    /* Destroy (completed)
+    /* Destroy
      * Purpose:
-     *      To safely clear the fields and their components.
+     *      Safely clears the fields and their components.
      */
     public void Destroy()
     {
-        for (int index = 0; index < size; index++)
-        {
-            rowHints[index].Destroy();
-            columnHints[index].Destroy();
-            gameboardList[index].Destroy();
-            solutionBoardList[index].Destroy();
-        }
-        rowHints = null;
-        columnHints = null;
-        gameboardList = null;
-        solutionBoardList = null;
+        tileList.Clear();
+        solutionList.Clear();
+        hintList.Clear();
+        tileList = null;
+        solutionList = null;
+        hintList = null;
     }
 
     #endregion
 
 }
 
-public enum Difficulty { Easy, Medium, Hard }
+public enum Difficulty { Easy, Medium, Hard, Size }
 
-public enum IndexType { Row, Column }
+public enum IndexType { Row, Column, Size }

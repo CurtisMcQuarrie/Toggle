@@ -33,14 +33,60 @@ public class Hint
 
     #endregion
 
-    #region interface
+    #region static methods
 
-    public void Add(int value)
+    /* ComputeHint
+     * Purpose:
+     *      To compute the hints for the specified List in the game.
+     * Params:
+     *      List<List<Tile>> solution   The solution board to determine the hint values.
+     *      int setIndex                What row or column is being considered.
+     *      IndexType indexType         Specifies whether row hints or column hints are being computed.
+     */
+    public static List<int> ComputeHint(List<List<Tile>> solution, int setIndex, IndexType indexType)
     {
-        hintValues.Add(value);
+        int consecutiveOn = 0;
+        List<int> computedHints = new List<int>();
+        // loop through the indices of the solution and count the Tiles that are consecutively on
+        for (int index = 0; index < solution.Count; index++)
+        {
+            Tile currTile = (indexType == IndexType.Row) ? solution[index][setIndex] : solution[setIndex][index];
+
+            // case A: the tile is not on and there is a value to add to the hint
+            if (!currTile.IsOn && consecutiveOn > 0)
+            {
+                computedHints.Add(consecutiveOn);
+                consecutiveOn = 0;
+            }
+            // case B: the tile is last tile in the row and it is on
+            else if ((index == solution.Count - 1) && currTile.IsOn)
+            {
+                consecutiveOn++;
+                computedHints.Add(consecutiveOn);
+                consecutiveOn = 0;
+            }
+            // case C: the tile is on
+            else if (currTile.IsOn)
+            {
+                consecutiveOn++;
+            }
+        }
+
+        return computedHints;
     }
 
-    public void Destroy()
+    #endregion
+
+    #region public methods
+
+    public bool IsSolved(List<List<Tile>> solution, int setIndex, IndexType indexType)
+    {
+        // compute the hints
+        List<int> computedHints = Hint.ComputeHint(solution, setIndex, indexType);
+        return (computedHints.Equals(this.hintValues)); 
+    }
+
+    public void Clear()
     {
         hintValues.Clear();
     }
