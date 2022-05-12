@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 /* Hint
  * Purpose:
@@ -50,7 +51,7 @@ public class Hint
         // loop through the indices of the solution and count the Tiles that are consecutively on
         for (int index = 0; index < solution.Count; index++)
         {
-            Tile currTile = (indexType == IndexType.Row) ? solution[index][setIndex] : solution[setIndex][index];
+            Tile currTile = (indexType == IndexType.Row) ? solution[setIndex][index] : solution[index][setIndex];
 
             // case A: the tile is not on and there is a value to add to the hint
             if (!currTile.IsOn && consecutiveOn > 0)
@@ -81,9 +82,7 @@ public class Hint
 
     public bool IsSolved(List<List<Tile>> solution, int setIndex, IndexType indexType)
     {
-        // compute the hints
-        List<int> computedHints = Hint.ComputeHint(solution, setIndex, indexType);
-        return (computedHints.Equals(this.hintValues)); 
+        return (IsEqual(Hint.ComputeHint(solution, setIndex, indexType))); 
     }
 
     public void Clear()

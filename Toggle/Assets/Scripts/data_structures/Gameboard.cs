@@ -84,56 +84,85 @@ public class Gameboard
         
         return tiles;
     }
+
     #endregion
-    
+
     #region public methods
-    
-    /* Toggle
+
+    /* ChangeDifficulty
      * Purpose:
-     *      Changes the state of the Tile to the opposite of its current state.
-     * Params:
-     *      Tile tile           The Tile instance to call Toggle method.
+     *      Changes the gameboard size and generates a new solution.
      */
-    public void Toggle(Tile tile)
+    public void ChangeDifficulty(Difficulty difficulty)
     {
-        tile?.Toggle();
+        SetDifficulty(difficulty); // change the board size
+        GenerateSolution();// generate new solution
+        GenerateHints();// generate new hints
     }
 
-    /* Toggle
+    /* CheckSolution
      * Purpose:
-     *      Changes the state of the Tile to the specified value.
-     * Params:
-     *      Tile tile           The Tile instance to call Toggle method.
-     *      bool isOn           The state to set the Tile instance too.
+     *      Checks if the gameboard state matches the solution.
      */
-    public void Toggle(Tile tile, bool isOn)
+    public bool CheckSolution()
     {
-        tile?.Toggle(isOn);
+        return (CheckSolution(IndexType.Row) && CheckSolution(IndexType.Column));
     }
 
-    /* Toggle
+    /* Clear (O(n^2) time complexity, n = size)
      * Purpose:
-     *      Changes the state of the Tile to the opposite of its current state.
-     * Params:
-     *      int row                 The row to locate the Tile instance.
-     *      int column              The column to locate the Tile instance.
+     *      Sets all Tiles within only the gameboard to false.
      */
-    public void Toggle(int row, int column)
+    public void Clear()
     {
-        tileList[row][column]?.Toggle();
+        // cycle through each Tile inside the tileList
+        for (int row = 0; row < size; row++)
+        {
+            for (int col = 0; col < size; col++)
+            {
+                tileList[row][col].Reset();
+            }
+        }
     }
 
-    /* Toggle
+    /* PrintSolution
      * Purpose:
-     *      Changes the state of the Tile to the specified value.
-     * Params:
-     *      int row                 The row to locate the Tile instance.
-     *      int column              The column to locate the Tile instance.
-     *      bool isOn               The state to set the Tile instance too.
+     *      For debug purposes only.
+     *      Allows the developer to see a solution in the debug window.
      */
-    public void Toggle(int row, int column, bool isOn)
+    public void PrintBoard(List<List<Tile>> board)
     {
-        tileList[row][column]?.Toggle(isOn);
+        StringBuilder solution = new StringBuilder();
+        for (int row = 0; row < size; row++)
+        {
+            for (int col = 0; col < size; col++)
+            {
+                solution.Append(board[row][col].ToString());
+            }
+            solution.Append("\n");
+        }
+        Debug.Log(solution.ToString());
+    }
+
+    /* PrintSolution
+     * Purpose:
+     *      For debug purposes only.
+     *      Allows the developer to see a solution in the debug window.
+     */
+    public void PrintSolution()
+    {
+        PrintBoard(solutionList);
+    }
+
+    /* Reroll
+     * Purpose:
+     *      Resets the gameboard and generates a new solution.
+     */
+    public void Reroll()
+    {
+        Reset(); // reset all boards and hints
+        GenerateSolution(); // generate new solution
+        GenerateHints(); // generate new hints
     }
 
     /* Reset (O(n^2) time complexity, n = size)
@@ -150,7 +179,7 @@ public class Gameboard
                 tileList[row][col].Reset();
                 solutionList[row][col].Reset();
                 // case A: row index is valid for Hint collection
-                if (row < (int) IndexType.Size)
+                if (row < (int)IndexType.Size)
                 {
                     hintList[row][col].Clear();
                 }
@@ -158,70 +187,68 @@ public class Gameboard
         }
     }
 
-    /* Clear (O(n^2) time complexity, n = size)
+    /* Toggle
      * Purpose:
-     *      Sets all Tiles within only the gameboard to false.
-     */ 
-    public void Clear()
+     *      Changes the state of the Tile to the opposite of its current state.
+     * Params:
+     *      Tile tile           The Tile instance to call Toggle method.
+     */
+    public void Toggle(Tile tile)
     {
-        // cycle through each Tile inside the tileList
-        for (int row = 0; row < size; row++)
+        tile?.Toggle();
+        if (CheckSolution()) // TODO: move to GameboardController
         {
-            for (int col = 0; col < size; col++)
-            {
-                tileList[row][col].Reset();
-            }
+            Debug.Log("You win!");
         }
     }
 
-    /* CheckSolution
+    /* Toggle
      * Purpose:
-     *      Checks if the gameboard state matches the solution.
+     *      Changes the state of the Tile to the specified value.
+     * Params:
+     *      Tile tile           The Tile instance to call Toggle method.
+     *      bool isOn           The state to set the Tile instance too.
      */
-    public bool CheckSolution()
+    public void Toggle(Tile tile, bool isOn)
     {
-        return (CheckSolution(IndexType.Row) && CheckSolution(IndexType.Column));
-    }
-
-    /* PrintSolution
-     * Purpose:
-     *      For debug purposes only.
-     *      Allows the developer to see a solution in the debug window.
-     */
-    public void PrintSolution()
-    {
-        StringBuilder solution = new StringBuilder();
-        for (int row = 0; row < size; row++)
+        tile?.Toggle(isOn);
+        if (CheckSolution()) // TODO: move to GameboardController
         {
-            for (int col = 0; col < size; col++)
-            {
-                solution.Append(solutionList[row][col].ToString());
-            }
-            solution.Append("\n");
+            Debug.Log("You win!");
         }
-        Debug.Log(solution.ToString());
     }
 
-    /* ChangeDifficulty
+    /* Toggle
      * Purpose:
-     *      Changes the gameboard size and generates a new solution.
-     */ 
-    public void ChangeDifficulty(Difficulty difficulty)
+     *      Changes the state of the Tile to the opposite of its current state.
+     * Params:
+     *      int row                 The row to locate the Tile instance.
+     *      int column              The column to locate the Tile instance.
+     */
+    public void Toggle(int row, int column)
     {
-        SetDifficulty(difficulty); // change the board size
-        GenerateSolution();// generate new solution
-        GenerateHints();// generate new hints
+        tileList[row][column]?.Toggle();
+        if (CheckSolution()) // TODO: move to GameboardController
+        {
+            Debug.Log("You win!");
+        }
     }
 
-    /* Reroll
+    /* Toggle
      * Purpose:
-     *      Resets the gameboard and generates a new solution.
-     */ 
-    public void Reroll()
+     *      Changes the state of the Tile to the specified value.
+     * Params:
+     *      int row                 The row to locate the Tile instance.
+     *      int column              The column to locate the Tile instance.
+     *      bool isOn               The state to set the Tile instance too.
+     */
+    public void Toggle(int row, int column, bool isOn)
     {
-        Reset(); // reset all boards and hints
-        GenerateSolution(); // generate new solution
-        GenerateHints(); // generate new hints
+        tileList[row][column]?.Toggle(isOn);
+        if (CheckSolution()) // TODO: move to GameboardController
+        {
+            Debug.Log("You win!");
+        }
     }
 
     #endregion
@@ -301,7 +328,6 @@ public class Gameboard
     private bool CheckSolution(IndexType indexType)
     {
         bool solved = true;
-
         // loop through index of row or column
         for (int index = 0; solved && index < size; index++)
         {
@@ -385,6 +411,7 @@ public class Gameboard
             hintList[1].Add(new Hint());
         }
     }
+
     #endregion
 
     #region destruction
