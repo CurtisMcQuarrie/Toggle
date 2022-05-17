@@ -62,6 +62,7 @@ public class TileObject : MonoBehaviour
         {
             this.gameboard = gameboard;
             this.tile = tile;
+            ConnectAttachedSubscribers();
         }
         else
         {
@@ -173,6 +174,19 @@ public class TileObject : MonoBehaviour
         foreach (ITileObjectSubscriber subscriber in subscribers)
         {
             subscriber.Update(this);
+        }
+    }
+
+    /* ConnectAttachedSubscribers
+     * Purpose: 
+     *      Subscribes the ITileObjectSubscriber scripts that are attached to this gameobject.
+     */
+    private void ConnectAttachedSubscribers()
+    {
+        ITileObjectSubscriber[] subscribers = gameObject.GetComponents<ITileObjectSubscriber>();
+        foreach (ITileObjectSubscriber subscriber in subscribers)
+        {
+            Subscribe(subscriber);
         }
     }
 

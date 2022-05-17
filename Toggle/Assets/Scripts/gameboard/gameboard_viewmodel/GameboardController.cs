@@ -11,9 +11,13 @@ public class GameboardController : MonoBehaviour
 {
     #region fields
 
+    // collections
     private List<GameObject> rowHints;
     private List<GameObject> columnHints;
+    private List<List<GameObject>> hintObjectList;
+    //private List<List<HintObject>> hintObjectList;
     private List<List<TileObject>> tileObjectList;
+
     private GameObject spacer;
 
     private Gameboard gameboard;
@@ -28,6 +32,7 @@ public class GameboardController : MonoBehaviour
     {
         // initialize private fields
         gameboard = new Gameboard();
+        hintObjectList = new List<List<GameObject>>();
         rowHints = new List<GameObject>();
         columnHints = new List<GameObject>();
         tileObjectList = new List<List<TileObject>>();
@@ -60,6 +65,7 @@ public class GameboardController : MonoBehaviour
         for (int col = 0; col < gameboard.Size; col++) // instantiate col hints
         {
             GameObject hint = gui.CreateHint(gameboard.GetColumnHints(col), IndexType.Column, gameboardTransform);
+            
             columnHints.Add(hint);
         }
 
@@ -74,12 +80,6 @@ public class GameboardController : MonoBehaviour
                 TileObject tileObject = tile.GetComponent<TileObject>();
                 tileObject.ConnectTile(gameboard, gameboard.GetTile(row, col)); // link gameobject to data structures
                 tileObjectList[row].Add(tileObject);
-                // connect subscribers attached to gameobject
-                ITileObjectSubscriber[] subscribers = tile.GetComponents<ITileObjectSubscriber>();
-                foreach (ITileObjectSubscriber subscriber in subscribers)
-                {
-                    tileObject.Subscribe(subscriber);
-                }
             }
         }
     }
@@ -161,6 +161,7 @@ public class GameboardController : MonoBehaviour
         //destroy all board objects
         for (int row = 0; row < gameboard.Size; row++)
         {
+            // destroy the hints
             gui.DestroyObject(rowHints[row].gameObject);
             gui.DestroyObject(columnHints[row].gameObject);
             // destroy the tiles
@@ -173,7 +174,9 @@ public class GameboardController : MonoBehaviour
         rowHints.Clear();
         columnHints.Clear();
         tileObjectList.Clear();
+
         gui.DestroyObject(spacer);
+
         spacer = null;
     }
 
