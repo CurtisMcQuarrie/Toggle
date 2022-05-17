@@ -85,16 +85,18 @@ public class TileObject : MonoBehaviour
             throw new System.Exception("Could not connect TileObject to gameboard and/or tile");
     }
 
-    /* Reset
+    /* Toggle
      * Purpose:
-     *      Changes the state of the Tile to false.
+     *      Changes the state of the Tile.
      *      Notifies all subscribers of this state change so that they can appropriately react.
+     * Params:
+     *      bool state          The new state to set the Tile too.
      */
-    public void Reset()
+    public void Toggle(bool state)
     {
         if (gameboard != null && tile != null)
         {
-            gameboard.Toggle(tile, false);
+            gameboard.Toggle(tile, state);
             NotifySubscribers();
         }
         else
@@ -103,15 +105,26 @@ public class TileObject : MonoBehaviour
         }
     }
 
+    /* Reset
+     * Purpose:
+     *      Changes the state of the Tile to false.
+     */
+    public void Reset()
+    {
+        Toggle(false);
+    }
+
     #endregion
 
     #region OnClick methods
 
+    /* TaskOnClick
+     * Purpose:
+     *      Performs a Toggle method call when this button is clicked.
+     */
     private void TaskOnClick()
     {
-        ToggleCommand toggleCommand = new ToggleCommand(this);
-        CommandManager.Instance.AddCommand(toggleCommand);
-        toggleCommand.Execute();
+        Toggle();
     }
 
     #endregion
@@ -127,7 +140,7 @@ public class TileObject : MonoBehaviour
      */
     public void Subscribe(ITileObjectSubscriber subscriber)
     {
-        // ensure that the subscriber is not null.
+        // ensure that the subscriber is not null
         if (subscriber != null)
         {
             subscribers.Add(subscriber);
@@ -142,7 +155,7 @@ public class TileObject : MonoBehaviour
      */
     public void UnSubscribe(ITileObjectSubscriber subscriber)
     {
-        // ensure that the subscriber is not null.
+        // ensure that the subscriber is not null
         if (subscriber != null)
         {
             subscribers.Remove(subscriber);
@@ -167,6 +180,10 @@ public class TileObject : MonoBehaviour
 
     #region destruction
 
+    /* Destroy
+     * Purpose:
+     *      Removes all instantiated variables
+     */
     private void OnDestroy()
     {
         gameboard = null;

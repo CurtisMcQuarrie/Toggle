@@ -41,8 +41,8 @@ public class GameboardController : MonoBehaviour
 
         // initalize the gameboard to the specified difficulty
         gameboard.ChangeDifficulty(gameManager.difficulty);
-        
-        // generate new GUI
+
+        // generate GUI for new gameboard
         Setup();
     }
     #endregion
@@ -138,8 +138,6 @@ public class GameboardController : MonoBehaviour
             gui.UpdateHint(gameboard.GetRowHints(index), IndexType.Row, rowHints[index]);
             gui.UpdateHint(gameboard.GetColumnHints(index), IndexType.Column, columnHints[index]);
         }
-        CommandManager commandManager = CommandManager.Instance;
-        commandManager.Reset(); // reset commandBuffer (prevent undo)
     }
 
     /* ClearGUI
@@ -177,8 +175,6 @@ public class GameboardController : MonoBehaviour
         tileObjectList.Clear();
         gui.DestroyObject(spacer);
         spacer = null;
-        CommandManager commandManager = CommandManager.Instance;
-        commandManager.Reset(); // reset commandBuffer (prevent undo)
     }
 
     #endregion
@@ -189,7 +185,9 @@ public class GameboardController : MonoBehaviour
         rowHints.Clear();
         columnHints.Clear();
         tileObjectList.Clear();
+
         gameboard.Destroy(); // important part
+
         gameboardTransform = null;
         gameManager = null;
         gui = null;
