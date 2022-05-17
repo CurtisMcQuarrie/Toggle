@@ -328,6 +328,7 @@ public class Gameboard
     private bool CheckSolution(IndexType indexType)
     {
         bool solved = true;
+
         // loop through index of row or column
         for (int index = 0; solved && index < size; index++)
         {
@@ -355,6 +356,7 @@ public class Gameboard
         tileList = new List<List<Tile>>();
         solutionList = new List<List<Tile>>();
         hintList = new List<List<Hint>>();
+
         size = 0;
         minAmountTilesOn = 0;
         maxAmountTilesOn = 0;
@@ -425,6 +427,7 @@ public class Gameboard
         tileList.Clear();
         solutionList.Clear();
         hintList.Clear();
+
         tileList = null;
         solutionList = null;
         hintList = null;

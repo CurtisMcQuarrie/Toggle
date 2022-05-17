@@ -11,17 +11,9 @@ public class GameboardController : MonoBehaviour
 {
     #region fields
 
-    // collections
-    private List<GameObject> rowHints;
-    private List<GameObject> columnHints;
-    private List<List<GameObject>> hintObjectList;
-    //private List<List<HintObject>> hintObjectList;
     private List<List<TileObject>> tileObjectList;
 
-    private GameObject spacer;
-
     private Gameboard gameboard;
-    public Transform gameboardTransform;
     private GameManager gameManager;
     private GameboardGUI gui;
 
@@ -32,9 +24,6 @@ public class GameboardController : MonoBehaviour
     {
         // initialize private fields
         gameboard = new Gameboard();
-        hintObjectList = new List<List<GameObject>>();
-        rowHints = new List<GameObject>();
-        columnHints = new List<GameObject>();
         tileObjectList = new List<List<TileObject>>();
     }
 
@@ -43,10 +32,6 @@ public class GameboardController : MonoBehaviour
         // retrieve dependencies
         gameManager = FindObjectOfType<GameManager>();
         gui = GetComponent<GameboardGUI>();
-
-        // initalize the gameboard to the specified difficulty
-        gameboard.ChangeDifficulty(gameManager.difficulty);
-
         // generate GUI for new gameboard
         Setup();
     }
@@ -60,44 +45,31 @@ public class GameboardController : MonoBehaviour
      */
     public void Setup()
     {
-        spacer = gui.CreateSpacer(gameboardTransform); // instantiate spacer panel
+        gameboard.ChangeDifficulty(gameManager.difficulty); // initalize the gameboard to the specified difficulty
+        
+        tileObjectList = gui.CreateBoard(gameboard); // use the gameboard to create the GUI
 
-        for (int col = 0; col < gameboard.Size; col++) // instantiate col hints
-        {
-            GameObject hint = gui.CreateHint(gameboard.GetColumnHints(col), IndexType.Column, gameboardTransform);
-            
-            columnHints.Add(hint);
-        }
-
-        // instantiate row hints and tiles simultaneously
+        // generate the TileObjects and connect them to the created GUI gameobjects
         for (int row = 0; row < gameboard.Size; row++)
         {
             tileObjectList.Add(new List<TileObject>());
-            rowHints.Add(gui.CreateHint(gameboard.GetRowHints(row), IndexType.Row, gameboardTransform));
             for (int col = 0; col < gameboard.Size; col++)
             {
-                GameObject tile = gui.CreateTile(gameboardTransform);
-                TileObject tileObject = tile.GetComponent<TileObject>();
-                tileObject.ConnectTile(gameboard, gameboard.GetTile(row, col)); // link gameobject to data structures
-                tileObjectList[row].Add(tileObject);
+                TileObject tileObject = tileObjectList[row][col];
+                tileObject.ConnectTile(gameboard, gameboard.GetTile(row, col));
             }
         }
     }
 
     // sets the difficulty
-    // TODO: remove
     public void ChangeDifficulty(int newDifficulty)
     {
-        Difficulty difficulty = (Difficulty)newDifficulty;
+        Difficulty difficulty = (Difficulty) newDifficulty;
+
         if (gameManager.difficulty != difficulty)
         {
-            Debug.Log("Setting difficulty to " + difficulty);
-            gameManager.difficulty = difficulty;
-            ResetBoardGUI();
-            gameboard.ChangeDifficulty(difficulty); // change gameboard difficulty
-            //UpdateLists(oldDifficulty, (int)difficulty);// TODO: add/remove hints and tiles
-            Setup();
-            //UpdateGUI();
+            gameManager.difficulty = difficulty; // update the global difficulty
+            Reset();
         }
     }
 
@@ -108,43 +80,16 @@ public class GameboardController : MonoBehaviour
      */
     public void Reroll()
     {
-        Debug.Log("Rerolling Board...");
-        gameboard.Reroll();
-        UpdateGUI();
-        gameboard.PrintSolution();
+        gameboard.Reroll(); // generate a new solution
+        Reset(); // delete existing GUI and reinstantiate a new one
     }
 
     /* Clear
      * Purpose:
-     *      Resets the gameboard state and the board GUI.
+     *      Goes through each TileObject and resets their state to false.
      *      Does not create a new solution.
-     */ 
+     */
     public void Clear()
-    {
-        gameboard.Clear();
-        ClearBoardGUI();
-    }
-    #endregion
-
-    #region gui
-
-    // assumes the datastructure has already been updated.
-    private void UpdateGUI()
-    {
-        ClearBoardGUI();
-        //update hints
-        for (int index = 0; index < rowHints.Count; index++) // cycle through rowHints and columnHints
-        {
-            gui.UpdateHint(gameboard.GetRowHints(index), IndexType.Row, rowHints[index]);
-            gui.UpdateHint(gameboard.GetColumnHints(index), IndexType.Column, columnHints[index]);
-        }
-    }
-
-    /* ClearGUI
-     * Purpose:
-     *      Cycle through tile objects and Reset them.
-     */ 
-    private void ClearBoardGUI()
     {
         for (int row = 0; row < gameboard.Size; row++)
         {
@@ -155,45 +100,25 @@ public class GameboardController : MonoBehaviour
         }
     }
 
-    // TODO
-    private void ResetBoardGUI()
+    public void Reset()
     {
-        //destroy all board objects
-        for (int row = 0; row < gameboard.Size; row++)
-        {
-            // destroy the hints
-            gui.DestroyObject(rowHints[row].gameObject);
-            gui.DestroyObject(columnHints[row].gameObject);
-            // destroy the tiles
-            for (int col = 0; col < gameboard.Size; col++)
-            {
-                gui.DestroyObject(tileObjectList[row][col].gameObject);
-            }
-        }
-        // clear lists
-        rowHints.Clear();
-        columnHints.Clear();
-        tileObjectList.Clear();
-
-        gui.DestroyObject(spacer);
-
-        spacer = null;
+        gui.DestroyAll(); // destroy existing GUI gameobjects 
+        Setup(); // reinstantiate the GUI gameobjects
     }
 
     #endregion
 
     #region destruction
+
     private void OnDestroy()
     {
-        rowHints.Clear();
-        columnHints.Clear();
         tileObjectList.Clear();
 
         gameboard.Destroy(); // important part
 
-        gameboardTransform = null;
         gameManager = null;
         gui = null;
     }
+
     #endregion
 }

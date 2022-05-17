@@ -183,7 +183,7 @@ public class TileObject : MonoBehaviour
      */
     private void ConnectAttachedSubscribers()
     {
-        ITileObjectSubscriber[] subscribers = gameObject.GetComponents<ITileObjectSubscriber>();
+        ITileObjectSubscriber[] subscribers = gameObject?.GetComponents<ITileObjectSubscriber>();
         foreach (ITileObjectSubscriber subscriber in subscribers)
         {
             Subscribe(subscriber);
