@@ -7,7 +7,6 @@ using UnityEngine.UI;
  *      Creates only a single object at a time.
  *      Special case for creating a hint because a hint requires children.
  */
-// TODO: add customization with scriptable object reference.
 public class GameboardGUI : MonoBehaviour
 {
     #region fields

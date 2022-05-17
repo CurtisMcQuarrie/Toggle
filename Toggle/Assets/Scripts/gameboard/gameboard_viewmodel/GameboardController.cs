@@ -13,7 +13,7 @@ public class GameboardController : MonoBehaviour
 
     private List<GameObject> rowHints;
     private List<GameObject> columnHints;
-    private List<TileRow> tileRows;
+    private List<List<TileObject>> tileObjectList;
     private GameObject spacer;
 
     private Gameboard gameboard;
@@ -26,25 +26,34 @@ public class GameboardController : MonoBehaviour
     #region monobehaviour
     void Awake()
     {
-        gameboard = new Gameboard(); // initializes gameboard
+        // initialize private fields
+        gameboard = new Gameboard();
         rowHints = new List<GameObject>();
         columnHints = new List<GameObject>();
-        tileRows = new List<TileRow>();
+        tileObjectList = new List<List<TileObject>>();
     }
 
     void Start()
     {
+        // retrieve dependencies
         gameManager = FindObjectOfType<GameManager>();
         gui = GetComponent<GameboardGUI>();
+
+        // initalize the gameboard to the specified difficulty
         gameboard.ChangeDifficulty(gameManager.difficulty);
-        gameboard.PrintSolution();
-        Initialize();
+        
+        // generate new GUI
+        Setup();
     }
     #endregion
 
     #region interface
-    // instantiates board gui and connects Tile instances to tile prefabs
-    public void Initialize()
+
+    /* Setup
+     * Purpose: 
+     *      Instantiates GUI components and attaches the appropriate scripts to them.
+     */
+    public void Setup()
     {
         spacer = gui.CreateSpacer(gameboardTransform); // instantiate spacer panel
 
@@ -57,14 +66,14 @@ public class GameboardController : MonoBehaviour
         // instantiate row hints and tiles simultaneously
         for (int row = 0; row < gameboard.Size; row++)
         {
-            tileRows.Add(new TileRow());
+            tileObjectList.Add(new List<TileObject>());
             rowHints.Add(gui.CreateHint(gameboard.GetRowHints(row), IndexType.Row, gameboardTransform));
             for (int col = 0; col < gameboard.Size; col++)
             {
                 GameObject tile = gui.CreateTile(gameboardTransform);
                 TileObject tileObject = tile.GetComponent<TileObject>();
                 tileObject.ConnectTile(gameboard, gameboard.GetTile(row, col)); // link gameobject to data structures
-                tileRows[row].Add(tileObject);
+                tileObjectList[row].Add(tileObject);
                 // connect subscribers attached to gameobject
                 ITileObjectSubscriber[] subscribers = tile.GetComponents<ITileObjectSubscriber>();
                 foreach (ITileObjectSubscriber subscriber in subscribers)
@@ -87,7 +96,7 @@ public class GameboardController : MonoBehaviour
             ResetBoardGUI();
             gameboard.ChangeDifficulty(difficulty); // change gameboard difficulty
             //UpdateLists(oldDifficulty, (int)difficulty);// TODO: add/remove hints and tiles
-            Initialize();
+            Setup();
             //UpdateGUI();
         }
     }
@@ -139,9 +148,12 @@ public class GameboardController : MonoBehaviour
      */ 
     private void ClearBoardGUI()
     {
-        for (int index = 0; index < gameboard.Size; index++)
+        for (int row = 0; row < gameboard.Size; row++)
         {
-            tileRows[index].Reset();
+            for (int col = 0; col < gameboard.Size; col++)
+            {
+                tileObjectList[row][col].Reset();
+            }
         }
     }
 
@@ -153,15 +165,16 @@ public class GameboardController : MonoBehaviour
         {
             gui.DestroyObject(rowHints[row].gameObject);
             gui.DestroyObject(columnHints[row].gameObject);
+            // destroy the tiles
             for (int col = 0; col < gameboard.Size; col++)
             {
-                gui.DestroyObject(tileRows[row].GetTileObject(col).gameObject);
+                gui.DestroyObject(tileObjectList[row][col].gameObject);
             }
         }
         // clear lists
         rowHints.Clear();
         columnHints.Clear();
-        tileRows.Clear();
+        tileObjectList.Clear();
         gui.DestroyObject(spacer);
         spacer = null;
         CommandManager commandManager = CommandManager.Instance;
@@ -175,7 +188,7 @@ public class GameboardController : MonoBehaviour
     {
         rowHints.Clear();
         columnHints.Clear();
-        tileRows.Clear();
+        tileObjectList.Clear();
         gameboard.Destroy(); // important part
         gameboardTransform = null;
         gameManager = null;
