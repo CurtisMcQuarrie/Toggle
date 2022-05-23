@@ -196,10 +196,6 @@ public class Gameboard
     public void Toggle(Tile tile)
     {
         tile?.Toggle();
-        if (CheckSolution()) // TODO: move to GameboardController
-        {
-            Debug.Log("You win!");
-        }
     }
 
     /* Toggle
@@ -212,10 +208,6 @@ public class Gameboard
     public void Toggle(Tile tile, bool isOn)
     {
         tile?.Toggle(isOn);
-        if (CheckSolution()) // TODO: move to GameboardController
-        {
-            Debug.Log("You win!");
-        }
     }
 
     /* Toggle

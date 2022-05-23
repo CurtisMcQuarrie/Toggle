@@ -20,6 +20,8 @@ public class GameboardGUI : MonoBehaviour
     [Header("Gameboard")]
     public GameObject spacerPrefab;
     public GameObject tilePrefab;
+    [Header("Panels")]
+    public GameObject winPanel;
 
     private List<GameObject> gameObjectList;
 
@@ -112,6 +114,15 @@ public class GameboardGUI : MonoBehaviour
         {
             throw new System.NullReferenceException("Trying to destroy an object that does not exist.");
         }
+    }
+
+    #endregion
+
+    #region panels
+
+    public void DisplayWinPanel(bool showPanel)
+    {
+        winPanel.SetActive(showPanel);
     }
 
     #endregion
@@ -224,4 +235,5 @@ public class GameboardGUI : MonoBehaviour
     }
 
     #endregion
+
 }

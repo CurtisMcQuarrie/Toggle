@@ -7,7 +7,7 @@ using UnityEngine;
  *      Uses GameboardGUI to instantiate gameboard prefabs and then connects them to the logic. 
  */
 [RequireComponent(typeof(GameboardGUI))]
-public class GameboardController : MonoBehaviour
+public class GameboardController : MonoBehaviour, ITileObjectSubscriber
 {
     #region fields
 
@@ -57,6 +57,7 @@ public class GameboardController : MonoBehaviour
             {
                 TileObject tileObject = tileObjectList[row][col];
                 tileObject.ConnectTile(gameboard, gameboard.GetTile(row, col));
+                tileObject.Subscribe(this);
             }
         }
     }
@@ -71,17 +72,6 @@ public class GameboardController : MonoBehaviour
             gameManager.difficulty = difficulty; // update the global difficulty
             Reset();
         }
-    }
-
-    /* Reroll
-     * Purpose:
-     *      To refresh the gameboard state, clear the gui and generate a new solution.
-     *      Difficulty is not changed.
-     */
-    public void Reroll()
-    {
-        gameboard.Reroll(); // generate a new solution
-        Reset(); // delete existing GUI and reinstantiate a new one
     }
 
     /* Clear
@@ -100,10 +90,25 @@ public class GameboardController : MonoBehaviour
         }
     }
 
+    /* Reroll
+     * Purpose:
+     *      To refresh the gameboard state, clear the gui and generate a new solution.
+     *      Difficulty is not changed.
+     */
+    public void Reroll()
+    {
+        Reset(); // delete existing GUI and reinstantiate a new one
+    }
+
     public void Reset()
     {
-        gui.DestroyAll(); // destroy existing GUI gameobjects 
+        gui.DestroyAll(); // destroy existing GUI gameobjects
         Setup(); // reinstantiate the GUI gameobjects
+    }
+
+    public void DisplayWinPanel(bool showPanel)
+    {
+        gui.DisplayWinPanel(showPanel);
     }
 
     #endregion
@@ -120,5 +125,22 @@ public class GameboardController : MonoBehaviour
         gui = null;
     }
 
+    #endregion
+
+    #region interface implementations
+
+    void ITileObjectSubscriber.Update(TileObject tile)
+    {
+        if (gameboard.CheckSolution())
+        {
+            gui.DisplayWinPanel(true);
+        }
+    }
+
+    void ISubscriber.Update()
+    {
+        throw new System.NotImplementedException();
+    }
+    
     #endregion
 }
