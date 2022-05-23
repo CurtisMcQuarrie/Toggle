@@ -47,8 +47,7 @@ public class Tile
 
     public bool Reset()
     {
-        if (isOn)
-            isOn = false;
+        isOn = false;
         return isOn;
     }
 
