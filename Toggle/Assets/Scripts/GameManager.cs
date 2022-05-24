@@ -18,6 +18,16 @@ public class GameManager : MonoBehaviour
     {
         DontDestroyOnLoad(this); // make it persist between scenes
     }
-    
+
     #endregion
+
+    #region public methods
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    #endregion
+
 }

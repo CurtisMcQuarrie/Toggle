@@ -13,7 +13,7 @@ public class Gameboard
 {
     #region constants
 
-    private const int initialSize = 3; // the starting size if no difficult is specified
+    private const int initialSize = 4; // the starting size if no difficult is specified
 
     #endregion
 
