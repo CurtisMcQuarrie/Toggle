@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
 
 /* GameboardGUI
  * Purpose:
@@ -16,7 +17,7 @@ public class GameboardGUI : MonoBehaviour
     public Sprite[] hintSprites;
     public GameObject[] dividerPrefabs = new GameObject[2];
     public GameObject[] hintPanelPrefabs = new GameObject[2];
-    public GameObject hintPrefab;
+    public TextMeshProUGUI hintPrefab;
     [Header("Gameboard")]
     public GameObject spacerPrefab;
     public GameObject tilePrefab;
@@ -82,11 +83,11 @@ public class GameboardGUI : MonoBehaviour
 
     #region hints
 
-    private GameObject CreateHint(int[] hints, IndexType indexType)
+    private TextMeshProUGUI CreateHint(int[] hints, IndexType indexType)
     {
-        GameObject hintPanel = CreatePrefab(hintPanelPrefabs[(int)indexType]);
-        FillHintsPrefab(hints, indexType, hintPanel.GetComponent<Transform>());
-        return hintPanel;
+        //GameObject hintPanel = CreatePrefab(hintPanelPrefabs[(int)indexType]);
+        TextMeshProUGUI hint = FillHintsPrefab(hints, indexType, this.transform); //hintPanel.GetComponent<Transform>());
+        return hint;
     }
 
     #endregion
@@ -186,33 +187,50 @@ public class GameboardGUI : MonoBehaviour
      *      IndexType indexType             Identifies the type of divider prefab to use.
      *      Transform parentTransform       The transform to attach the instantiated hints onto.
      */
-    private void FillHintsPrefab(int[] hints, IndexType indexType, Transform parentTransform)
+    private TextMeshProUGUI FillHintsPrefab(int[] hints, IndexType indexType, Transform parentTransform)
     {
+        TextMeshProUGUI hintText = null;
         if (hints != null)
         {
+            // add hint to parent panel
+            hintText = CreatePrefab(hintPrefab.gameObject, parentTransform).GetComponent<TextMeshProUGUI>();
+            hintText.text = "";
+
             for (int i = 0; i < hints.Length; i++)
             {
-                // add hint to parent panel
-                GameObject instantiatedObject = CreatePrefab(hintPrefab, parentTransform);
+                // set hint text
+                hintText.text += hints[i];
+                
+                // add hyphen if not the last hint
+                if ((i + 1) % 2 == 0)
+                {
+                    hintText.text += "\n";
+                }
+                else if (i < hints.Length - 1)
+                {
+                    hintText.text += "-";
+                }
 
                 // set sprite in hint
-                if (hints[i] > 0)
-                {
-                    Sprite texture = hintSprites[hints[i]-1];
-                    instantiatedObject.GetComponent<Image>().sprite = texture;
-                }
+                //if (hints[i] > 0)
+                //{
+                //    Sprite texture = hintSprites[hints[i]-1];
+                //    textObject.GetComponent<Image>().sprite = texture;
+                //}
 
                 // instantiate dividers
-                if (i != hints.Length - 1)
-                {
-                    CreatePrefab(dividerPrefabs[(int)indexType], parentTransform);
-                }
+                //if (i != hints.Length - 1)
+                //{
+                //    CreatePrefab(dividerPrefabs[(int)indexType], parentTransform);
+                //}
             }
         }
         else
         {
             throw new System.NullReferenceException("Trying to create Hints gameobjects with null hints");
         }
+
+        return hintText;
     }
 
     #endregion

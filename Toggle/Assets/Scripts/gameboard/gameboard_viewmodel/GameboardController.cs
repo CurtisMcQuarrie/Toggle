@@ -66,12 +66,9 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
     public void ChangeDifficulty(int newDifficulty)
     {
         Difficulty difficulty = (Difficulty) newDifficulty;
-
-        if (gameManager.difficulty != difficulty)
-        {
-            gameManager.difficulty = difficulty; // update the global difficulty
-            Reset();
-        }
+        
+        gameManager.difficulty = difficulty; // update the global difficulty
+        Reset();
     }
 
     /* Clear
