@@ -1,0 +1,44 @@
+# Layers
+## Tags and Layers
+- First 8 layers cannot be changed and are reserved for Unity.
+- Layer 31 cannot be used either.
+- Can define 23 different layers.
+- Camera culling mask
+	- Deselecting a layer in this option will result in any gameobject on that layer to not being rendered.
+	- Collisions still work.
+	- Light sources also have a culling mask.
+- Physics:
+	- Can specify what layers can collide with eachother.
+## Layers and LayerMasks
+- Often used together with raycasts.
+- Ignore raycast layer is a special layer that will never return true if a ray hits it.
+	- Unless you specify this layer in the Physics.Raycast method.
+## Layer Representation
+- Layers are special numbers
+- Layers are numbers filled with zeroes except for a single position.
+	- Layers are represented by the position of the 1 bit and not the whole number.
+- Integers are mainly represented by 32bits and so that's why there is only 32 layers available.
+	- This makes layers lightweight and high performance.
+- Assigning an object a layer by script.
+	- Referring to layers by their indice (0-31).
+	- `gameObject.layer = 9;`
+	- `gameObject.layer = LayerMask.NameToLayer("LayerB");`
+	- Call also get the name of the layer using  `LayerMask.LayerToName(gameObject.layer);`
+## Layer Masks
+- A layermask is also a bit number.
+- There can be more than one 1's in this number.
+- The 1 in a given index represents what layers the layer mask will accept/acknowledge.
+	- A bit mask.
+- Generating layer masks with bit shifting.
+	- Use `var mask = LayerMask.GetMask("Player", "Enemy");`
+	- Calling `gameObject.layer` does actually return the layerMask, it returns an integer number that represents the index.
+	- Use the left shift operator (`<<`) to get the layers.
+	- `var mask = 1 << gameObject.layer;`
+	- You can then past that mask into the Physics.Raycast method.
+- Combining layermasks:
+	- Usee the OR operation.
+	- `A | B = C`
+	- Where A is one layer and B is another.
+	- This also works with composite layer masks.
+# Sorting Layers and Order
+- 

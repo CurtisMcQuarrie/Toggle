@@ -1,0 +1,18 @@
+Is it necessary to have scene changes in the game?
+	> not really since the whole game is UI based.
+	> if I do implement it, then I would need to focus on persistent gameobjects and data through the scenes.
+	
+What would the scenes be?
+	> Menu Scene
+	> Game Scene
+	
+Common panels between scenes
+	> Settings
+	> Profile
+	
+Data that needs to be communicated between scenes
+	> aesthetic
+	> difficulty
+	> playerProfile
+	
+Game Scene would start when difficulty is chosen.
