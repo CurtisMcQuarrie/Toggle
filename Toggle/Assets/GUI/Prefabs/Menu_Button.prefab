@@ -239,6 +239,7 @@ GameObject:
   - component: {fileID: 7202800554526542220}
   - component: {fileID: 1258471106319888861}
   - component: {fileID: 6064131521195053118}
+  - component: {fileID: -8533590333246466470}
   m_Layer: 5
   m_Name: Menu_Button
   m_TagString: Untagged
@@ -302,6 +303,21 @@ MonoBehaviour:
   inType: 8
   outType: 10
   outDuration: 0.2
+--- !u!114 &-8533590333246466470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7202800554526542221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fc169f3270dd6c4ea188fcee15c66ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonEnterClip: MenuButtonEnter
+  buttonExitClip: MenuButtonExit
+  buttonClickClip: MenuButtonClick
 --- !u!1 &7202800555134947549
 GameObject:
   m_ObjectHideFlags: 0
