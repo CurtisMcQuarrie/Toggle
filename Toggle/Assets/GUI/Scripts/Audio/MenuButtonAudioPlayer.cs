@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class MenuButtonAudioPlayer : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class MenuButtonAudioPlayer : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler
 {
 
     #region fields
@@ -26,18 +26,6 @@ public class MenuButtonAudioPlayer : MonoBehaviour, IPointerEnterHandler, IPoint
         else
         {
             AudioManager.instance.PlaySFX(buttonEnterClip);
-        }
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (buttonExitClip == null)
-        {
-            Debug.LogWarning("No audio clip for button exit clip.");
-        }
-        else
-        {
-            AudioManager.instance.PlaySFX(buttonExitClip);
         }
     }
 
