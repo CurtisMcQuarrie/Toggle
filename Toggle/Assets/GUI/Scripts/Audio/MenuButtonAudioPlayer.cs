@@ -1,15 +1,13 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class MenuButtonAudioPlayer : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler
+public class MenuButtonAudioPlayer : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
 
     #region fields
 
     [SerializeField]
     private string buttonEnterClip;
-    [SerializeField]
-    private string buttonExitClip;
     [SerializeField]
     private string buttonClickClip;
 
@@ -27,6 +25,14 @@ public class MenuButtonAudioPlayer : MonoBehaviour, IPointerEnterHandler, IPoint
         {
             AudioManager.instance.PlaySFX(buttonEnterClip);
         }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
     }
 
     public void OnPointerClick(PointerEventData eventData)

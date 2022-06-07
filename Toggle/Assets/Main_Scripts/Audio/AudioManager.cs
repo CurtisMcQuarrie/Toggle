@@ -132,6 +132,19 @@ public class AudioManager : MonoBehaviour
         sound.Source.volume = sound.CurrentVolume;
     }
 
+    public void SetFXVolume(float percentage)
+    {
+        foreach (Sound sound in soundFX)
+        {
+            SetVolume(sound, percentage);
+        }
+    }
+
+    public void SetMusicVolume(float percentage)
+    {
+        SetVolume(music, percentage);
+    }
+
     /// <summary>
     /// Plays the specified Sound parameter if not null.
     /// </summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ using UnityEngine;
 public class GameboardController : MonoBehaviour, ITileObjectSubscriber
 {
     #region fields
+
+    public float loadGameDelay = 0f;
 
     private List<List<TileObject>> tileObjectList;
 
@@ -32,8 +35,6 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
         // retrieve dependencies
         gameManager = FindObjectOfType<GameManager>();
         gui = GetComponent<GameboardGUI>();
-        // generate GUI for new gameboard
-        Setup();
     }
     #endregion
 
@@ -65,10 +66,7 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
     // sets the difficulty
     public void ChangeDifficulty(int newDifficulty)
     {
-        Difficulty difficulty = (Difficulty) newDifficulty;
-        
-        gameManager.difficulty = difficulty; // update the global difficulty
-        Reset();
+        StartCoroutine(LoadGame(newDifficulty));
     }
 
     /* Clear
@@ -108,6 +106,24 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
         gui.DisplayWinPanel(showPanel);
     }
 
+    public void DisplayGamePanel(bool showPanel)
+    {
+        gui.DisplayGamePanel(showPanel);
+    }
+
+    #region IEnumerators
+
+    IEnumerator LoadGame(int newDifficulty)
+    {
+        Difficulty difficulty = (Difficulty)newDifficulty;
+
+        gameManager.difficulty = difficulty; // update the global difficulty
+        yield return new WaitForSeconds(loadGameDelay);
+        Reset();
+    }
+
+    #endregion
+
     #endregion
 
     #region destruction
@@ -131,6 +147,7 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
         if (gameboard.CheckSolution())
         {
             gui.DisplayWinPanel(true);
+            gui.DisplayGamePanel(false);
         }
     }
 
