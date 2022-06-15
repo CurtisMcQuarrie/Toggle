@@ -92,7 +92,7 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
      */
     public void Reroll()
     {
-        Reset(); // delete existing GUI and reinstantiate a new one
+        StartCoroutine(LoadGame((int)gameManager.difficulty));
     }
 
     public void Reset()
