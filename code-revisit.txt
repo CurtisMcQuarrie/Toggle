@@ -1,0 +1,17 @@
+# Patterns
+## Command Pattern.
+Interfaces
+- ICommand
+- ISubscriber
+- IPublisher
+- ITileObjectSubscriber
+Concrete Classes
+- TileObject : IPublisher
+- ToggleCommand : ICommand
+# Model
+Concrete Classes
+- BoardRow
+- Gameboard
+- Hint
+- Tile
+- TileRow
