@@ -32,8 +32,6 @@ public class AudioManager : MonoBehaviour
     {
         GetInstance();
 
-        DontDestroyOnLoad(gameObject);
-
         SetupSounds();
     }
 

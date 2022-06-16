@@ -43,7 +43,7 @@ public class TweenBouncer : MonoBehaviour
 
     private void Bounce()
     {
-        LeanTween.scale(rect, targetScale, speed).setLoopPingPong();
+        LeanTween.scale(rect, targetScale, speed).setEase(type).setLoopPingPong();
     }
 
     #endregion

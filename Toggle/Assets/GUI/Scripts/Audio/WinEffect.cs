@@ -37,9 +37,13 @@ public class WinEffect : MonoBehaviour
 
     #region monobehaviour
 
-    private void OnEnable()
+    private void Awake()
     {
         buttonsTweenDelay += titleTweenDuration;
+    }
+
+    private void OnEnable()
+    {
         PlayAudio();
         PlayGOAnimations();
     }
@@ -51,11 +55,6 @@ public class WinEffect : MonoBehaviour
         buttonsGO.GetComponent<RectTransform>().transform.localPosition = buttonsStartPosition;
     }
 
-    private void PlayGOAnimations()
-    {
-        LeanTween.moveLocal(titleGO, titleEndPosition, titleTweenDuration).setEase(titleTweenType);
-        LeanTween.moveLocal(buttonsGO, buttonsEndPosition, buttonsTweenDuration).setEase(buttonsTweenType).setDelay(buttonsTweenDelay);
-    }
 
     #endregion
 
@@ -71,6 +70,12 @@ public class WinEffect : MonoBehaviour
         {
             AudioManager.instance.PlaySFX(audioClip);
         }
+    }
+
+    private void PlayGOAnimations()
+    {
+        LeanTween.moveLocal(titleGO, titleEndPosition, titleTweenDuration).setEase(titleTweenType);
+        LeanTween.moveLocal(buttonsGO, buttonsEndPosition, buttonsTweenDuration).setEase(buttonsTweenType).setDelay(buttonsTweenDelay);
     }
 
     #endregion

@@ -13,6 +13,7 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
     #region fields
 
     public float loadGameDelay = 0f;
+    public SimpleTimer timer;
 
     private List<List<TileObject>> tileObjectList;
 
@@ -66,6 +67,8 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
     // sets the difficulty
     public void ChangeDifficulty(int newDifficulty)
     {
+        timer.StopStopWatch();
+        timer.ResetStopWatch();
         StartCoroutine(LoadGame(newDifficulty));
     }
 
@@ -92,6 +95,8 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
      */
     public void Reroll()
     {
+        timer.StopStopWatch();
+        timer.ResetStopWatch();
         StartCoroutine(LoadGame((int)gameManager.difficulty));
     }
 
@@ -120,6 +125,7 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
         gameManager.difficulty = difficulty; // update the global difficulty
         yield return new WaitForSeconds(loadGameDelay);
         Reset();
+        timer.StartStopWatch();
     }
 
     #endregion
@@ -146,6 +152,8 @@ public class GameboardController : MonoBehaviour, ITileObjectSubscriber
     {
         if (gameboard.CheckSolution())
         {
+            timer.StopStopWatch();
+            timer.ResetStopWatch();
             gui.DisplayWinPanel(true);
             gui.DisplayGamePanel(false);
         }
