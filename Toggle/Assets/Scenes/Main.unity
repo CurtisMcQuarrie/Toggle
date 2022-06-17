@@ -10437,8 +10437,8 @@ MonoBehaviour:
     loop: 0
   music:
     name: Theme
-    clip: {fileID: 0}
-    volume: 0.5
+    clip: {fileID: 8300000, guid: b2eac711f5157bf40ad9c1dc5004c4cd, type: 3}
+    volume: 0.1
     pitch: 1
     loop: 1
   soundFXVolume: 1
