@@ -13,6 +13,7 @@ public class TransitionManager : MonoBehaviour
     public GameObject settingsCanvas;
     public GameObject winCanvas;
     public GameObject gameboardCanvas;
+    public GameObject infoCanvas;
     
     [Header("TransitionTweens")]
     public TweenTranslater transitioner;
@@ -86,6 +87,8 @@ public class TransitionManager : MonoBehaviour
 
         transitionScenarios.Add(new Tuple<GameObject, GameObject>(mainMenuCanvas, difficultySelectCanvas));
         transitionScenarios.Add(new Tuple<GameObject, GameObject>(mainMenuCanvas, settingsCanvas));
+        transitionScenarios.Add(new Tuple<GameObject, GameObject>(mainMenuCanvas, infoCanvas));
+        transitionScenarios.Add(new Tuple<GameObject, GameObject>(infoCanvas, mainMenuCanvas));
         transitionScenarios.Add(new Tuple<GameObject, GameObject>(difficultySelectCanvas, mainMenuCanvas));
         transitionScenarios.Add(new Tuple<GameObject, GameObject>(difficultySelectCanvas, gameboardCanvas));
         transitionScenarios.Add(new Tuple<GameObject, GameObject>(difficultySelectCanvas, winCanvas));
@@ -99,6 +102,8 @@ public class TransitionManager : MonoBehaviour
 
         transitionScenarioStrings.Add("MainMenuToDifficultySelect");
         transitionScenarioStrings.Add("MainMenuToSettings");
+        transitionScenarioStrings.Add("MainMenuToInfo");
+        transitionScenarioStrings.Add("InfoToMainMenu");
         transitionScenarioStrings.Add("DifficultySelectToMainMenu");
         transitionScenarioStrings.Add("DifficultySelectToGameboard");
         transitionScenarioStrings.Add("DifficultySelectToWin");
