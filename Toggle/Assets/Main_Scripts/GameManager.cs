@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        DontDestroyOnLoad(this); // make it persist between scenes
+        DontDestroyOnLoad(transform.parent.gameObject); // make it persist between scenes
     }
 
     #endregion

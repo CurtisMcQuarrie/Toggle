@@ -19,6 +19,8 @@ public class GameboardGUI : MonoBehaviour
     public GameObject spacerPrefab;
     public GameObject tilePrefab;
     [Header("Panels")]
+    public Transform gameboardPanel;
+    public GameObject gamePanel;
     public GameObject winPanel;
 
     private List<GameObject> gameObjectList;
@@ -82,7 +84,7 @@ public class GameboardGUI : MonoBehaviour
 
     private void CreateHint(int[] hints, IndexType indexType)
     {
-        FillHintsPrefab(hints, indexType, this.transform);
+        FillHintsPrefab(hints, indexType, gameboardPanel);
     }
 
     #endregion
@@ -121,6 +123,11 @@ public class GameboardGUI : MonoBehaviour
         winPanel.SetActive(showPanel);
     }
 
+    public void DisplayGamePanel(bool showPanel)
+    {
+        gamePanel.SetActive(showPanel);
+    }
+
     #endregion
 
     #endregion
@@ -139,7 +146,7 @@ public class GameboardGUI : MonoBehaviour
 
         if (prefab != null)
         {
-            instantiatedObject = Instantiate(prefab, gameObject.GetComponent<Transform>());
+            instantiatedObject = Instantiate(prefab, gameboardPanel);
             gameObjectList.Add(instantiatedObject);
         }
         else

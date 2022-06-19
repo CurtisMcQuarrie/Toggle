@@ -261,7 +261,7 @@ public class Gameboard
         // generate the number of tiles on in this solution
         System.Random randomIntGen = new System.Random();
         int amountTilesOn = randomIntGen.Next(minAmountTilesOn, maxAmountTilesOn + 1);
-        Debug.Log("Amount = " + amountTilesOn + "\tMin = " + minAmountTilesOn + "\t\tMax = " + maxAmountTilesOn);
+        //Debug.Log("Amount = " + amountTilesOn + "\tMin = " + minAmountTilesOn + "\t\tMax = " + maxAmountTilesOn);
         // generate random tuples that represent tile indices inside tileList
         for (int index = 0; index < amountTilesOn; index++)
         {

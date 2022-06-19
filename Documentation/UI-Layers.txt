@@ -1,0 +1,27 @@
+Layers
+Sorting Layers
+Sorting Groups
+Order in Layer
+	- 0 means its the bottom most.
+	- inf means its the top most.
+	
+# Layer Orders on Default Layer
+-2:		background
+-1:		particles
+0:		gameboard
+1:		main menu
+2:		win
+3:		difficulty
+3:		setttings
+4:		particles
+6:		transition
+
+## Rules
+Transition must always be on top of all other canvas'.
+Background must always be on the bottom.
+All other canvas' must be deactivated when not being used.		
+
+## New Layer Order
+0: background
+5: all others
+10: transition

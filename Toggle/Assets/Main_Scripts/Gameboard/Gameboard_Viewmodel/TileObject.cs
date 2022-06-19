@@ -2,17 +2,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-/* TileObject
- * Purpose:
- *      Allows the player to change the board state.
- *      Acts as a vessel to the Gameboard and Tile datastructures.
- * Remarks:
- *      Attached to each Button on the gameboard.
- *      Implements an Observer Pattern whenever the button it is attached to is pressed.
- */
+/// <summary>
+/// Allows the player to change the board state.
+/// Acts as a vessel to the Gameboard and Tile datastructures.
+/// Attached to each Button on the gameboard.
+/// Implements an Observer Pattern whenever the button it is attached to is pressed.
+/// </summary>
 [RequireComponent(typeof(Button))]
 public class TileObject : MonoBehaviour
 {
+
     #region fields
 
     private Gameboard gameboard;
@@ -47,15 +46,12 @@ public class TileObject : MonoBehaviour
 
     #region interface
 
-    /* ConnectTile
-     * Purpose:
-     *      Connects the "model" layer to the TileObject ("ViewModel" layer).
-     *      Needs to be called whenever instantiating a TileObject_Prefab.
-     * Params:
-     *      Gameboard gameboard         The active gameboard being used in the scene.
-     *      Tile tile                   A Tile within the active gameboard that will be 
-     *                                  attached to this Gameboard.
-     */
+    /// <summary>
+    /// Connects the "model" layer to the TileObject ("ViewModel" layer).
+    /// Needs to be called whenever instantiating a TileObject_Prefab.
+    /// </summary>
+    /// <param name="gameboard">The active gameboard being used in the scene.</param>
+    /// <param name="tile">A Tile within the active gameboard that will be attached to this Gameboard.</param>
     public void ConnectTile(Gameboard gameboard, Tile tile)
     {
         if (gameboard != null && tile != null)
@@ -70,11 +66,10 @@ public class TileObject : MonoBehaviour
         }
     }
 
-    /* Toggle
-     * Purpose:
-     *      Changes the state of the Tile.
-     *      Notifies all subscribers of this state change so that they can appropriately react.
-     */
+    /// <summary>
+    /// Changes the state of the Tile.
+    /// Notifies all subscribers of this state change so that they can appropriately react.
+    /// </summary>
     public void Toggle()
     {
         if (gameboard != null && tile != null)
@@ -86,13 +81,11 @@ public class TileObject : MonoBehaviour
             throw new System.Exception("Could not connect TileObject to gameboard and/or tile");
     }
 
-    /* Toggle
-     * Purpose:
-     *      Changes the state of the Tile.
-     *      Notifies all subscribers of this state change so that they can appropriately react.
-     * Params:
-     *      bool state          The new state to set the Tile too.
-     */
+    /// <summary>
+    /// Changes the state of the Tile.
+    /// Notifies all subscribers of this state change so that they can appropriately react.
+    /// </summary>
+    /// <param name="state">The new state to set the Tile too.</param>
     public void Toggle(bool state)
     {
         if (gameboard != null && tile != null)
@@ -106,10 +99,9 @@ public class TileObject : MonoBehaviour
         }
     }
 
-    /* Reset
-     * Purpose:
-     *      Changes the state of the Tile to false.
-     */
+    /// <summary>
+    /// Changes the state of the Tile to false.
+    /// </summary>
     public void Reset()
     {
         Toggle(false);
@@ -117,12 +109,11 @@ public class TileObject : MonoBehaviour
 
     #endregion
 
-    #region OnClick methods
+    #region on click methods
 
-    /* TaskOnClick
-     * Purpose:
-     *      Performs a Toggle method call when this button is clicked.
-     */
+    /// <summary>
+    /// Performs a Toggle method call when this button is clicked.
+    /// </summary>
     private void TaskOnClick()
     {
         Toggle();
@@ -132,13 +123,11 @@ public class TileObject : MonoBehaviour
 
     #region publisher methods
 
-    /* Subscribe
-     * Purpose: 
-     *      Adds a subscriber to it's list so that it will be notified when
-     *      a notable change occurs to the GameObject that this script is attached too.
-     * Params:
-     *      ITileObjectSubscriber subscriber        The object to add to the list of subscribers.
-     */
+    /// <summary>
+    /// Adds a subscriber to it's list so that it will be notified when a notable change occurs to 
+    /// the GameObject that this script is attached too.
+    /// </summary>
+    /// <param name="subscriber">The object to add to the list of subscribers.</param>
     public void Subscribe(ITileObjectSubscriber subscriber)
     {
         // ensure that the subscriber is not null
@@ -148,12 +137,10 @@ public class TileObject : MonoBehaviour
         }
     }
 
-    /* UnSubscribe
-     * Purpose: 
-     *      Removes the specified subscriber from it's list.
-     * Params:
-     *      ITileObjectSubscriber subscriber        The object to remove from the list of subscribers.
-     */
+    /// <summary>
+    /// Removes the specified subscriber from it's list.
+    /// </summary>
+    /// <param name="subscriber">The object to remove from the list of subscribers.</param>
     public void UnSubscribe(ITileObjectSubscriber subscriber)
     {
         // ensure that the subscriber is not null
@@ -163,11 +150,9 @@ public class TileObject : MonoBehaviour
         }
     }
 
-    /* NotifySubscribers
-     * Purpose: 
-     *      Notifies all subscribers in the subscriber list so that each will react to the notable
-     *      state change.
-     */
+     /// <summary>
+     /// Notifies all subscribers in the subscriber list so that each will react to the notable state change.
+     /// </summary>
     public void NotifySubscribers()
     {
         // loop through each subscriber in the list
@@ -177,13 +162,12 @@ public class TileObject : MonoBehaviour
         }
     }
 
-    /* ConnectAttachedSubscribers
-     * Purpose: 
-     *      Subscribes the ITileObjectSubscriber scripts that are attached to this gameobject.
-     */
+    /// <summary>
+    /// Subscribes the ITileObjectSubscriber scripts that are attached to this gameobject.
+    /// </summary>
     private void ConnectAttachedSubscribers()
     {
-        ITileObjectSubscriber[] subscribers = gameObject?.GetComponents<ITileObjectSubscriber>();
+        ITileObjectSubscriber[] subscribers = gameObject.GetComponents<ITileObjectSubscriber>();
         foreach (ITileObjectSubscriber subscriber in subscribers)
         {
             Subscribe(subscriber);
@@ -194,10 +178,9 @@ public class TileObject : MonoBehaviour
 
     #region destruction
 
-    /* Destroy
-     * Purpose:
-     *      Removes all instantiated variables
-     */
+    /// <summary>
+    /// Removes all instantiated variables.
+    /// </summary>
     private void OnDestroy()
     {
         gameboard = null;
