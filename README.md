@@ -1,5 +1,5 @@
 # Toggle
-Toggle! Remade is available to play at my [itch.io](https://mcquarriecurtis.itch.io/toggle-remade) page.
+Toggle! Remade is available to play at my itch.io page [(https://mcquarriecurtis.itch.io/toggle-remade)](https://mcquarriecurtis.itch.io/toggle-remade).
 
 ## Description
 Relax and enjoy the nautical themed ambience and casually solve some gameboards! It's a casual puzzle game designed for when you just want to vibe and solve some puzzles.
