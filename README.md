@@ -11,4 +11,4 @@ The goal of the game is turn tiles on until the rows and columns match the hints
 At the moment, I have completed my development of this project and moved on to other games.
 
 ## Development Comments
-This is a remake of the original Toggle! puzzle Game. The source code of the original game was lost and so this game was created from scratch again! Created and developed independently by Curtis McQuarrie. Visit my [itch.io](https://mcquarriecurtis.itch.io/) page to play more of my games!
+This is a remake of the original Toggle! puzzle Game. The source code of the original game was lost and so this game was created from scratch again! Created and developed independently by Curtis McQuarrie. Visit my itch.io page to play more of my games! [https://mcquarriecurtis.itch.io/](https://mcquarriecurtis.itch.io/)
