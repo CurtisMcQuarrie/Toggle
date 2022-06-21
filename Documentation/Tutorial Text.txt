@@ -1,0 +1,38 @@
+There are two main panels you can see when playing the game: the gameboard and the utility panel.
+The Gameboard:
+[Image1]
+The gameboard is where you will play the game.
+It holds the Hints and the Tiles.
+Tiles:
+[Image2] [Image3]
+Tiles can be turned On/Off by clicking on them.
+Hints:
+There are Hints for the rows and columns.
+The row hints appear on the left side of the Gameboard.
+[Image4]
+The column hints appear on the right side of the Gameboard.
+[Image5]
+Hints are what you use to solve the Gameboard.
+Take this Hint for example.
+[image6]
+This Hint is a row Hint and it tells you several things.
+1. There must be 2 Tiles are turned On consecutively (side-by-side). 
+2. There is at least 1 Tile afterwards that must be turned Off after the first 2 On Tiles.
+3. There is another Tile that must be turned On after the off Tile(s).
+Here is what the solution would look like.
+[Image7]
+The column Hints work the same way, except the solution would be vertical instead of horizontal.
+How To Win:
+You must use the Hints to determine which Tiles should be turned On/Off.
+The Utility Panel:
+[Image8]
+The utility panel is where you can manipulate the Gameboard or go to other parts of the game.
+It consists of several components.
+1. A Stopwatch that is just there to tell you how long you have playing the current board.
+2. A Clear button that lets you turn all the Tiles in the Gameboard Off.
+3. A Reroll button that generates a new Gameboard and therefore new Hints.
+4. A Change Difficulty button that takes you to the Difficulty select menu.
+5. A Quit button that takes you back to the main menu.
+
+
+
