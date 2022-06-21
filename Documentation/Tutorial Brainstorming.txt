@@ -1,0 +1,37 @@
+# Tutorial
+## Implementation
+### Instantiation Idea 01
+Instantiate the gameboard with already made gameboard hints.
+### Instantiation Idea 02
+Instantiate the gameboard in the default way.
+### Guide Idea 01
+Mask certain areas of the gameboard.
+- Use a panel that is darkened and blocks raycasts.
+- Use the mask to have transparent areas where the raycasts are not blocked.
+### Guide Idea 02
+Use text fields that will describe how the user proceeds through the tutorial.
+- When the user clicks on the screen or on a certain area, it will go to the next text.
+### Guide Idea 03
+The mask can have two purposes:
+
+1. Prevent the user from clicking on something they shouldn't.
+2. Act as a button that will call the next tutorial display.
+
+### Gameboard Idea 01
+Add an `isTutorial` bool to the `GameboardController`.
+This way, the Tutorial Panel can be turned on/off when appropriate.
+### Gameboard Idea 02
+Add a constructor to the Gameboard that will create a gameboard with pre-determined Hints.
+### Tutorial Script Idea 01
+Create a `TutorialGUI` class that controls the gui during the tutorial.
+Add a check if `isTutorial` is on in the `GameboardController`.
+Add an instance of the `TutorialGUI` in the `GameboardController`.
+### Stopping Tutorial Idea 01
+Stop the tutorial when either:
+- The player wins the game.
+- The player quits the game.
+
+i.e. Whenever the Gameboard_Canvas is set inactive.
+### Tutorial Script Idea 02
+Attach the `TutorialController` script to the tutorial panel.
+Have the tutorial panel turn off every time the Gameboard_Canvas is set to inactive.
